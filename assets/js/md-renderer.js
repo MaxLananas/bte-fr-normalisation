@@ -1,228 +1,229 @@
-const MARKED_CDN = 'https://cdn.jsdelivr.net/npm/marked@9/marked.min.js';
+(function () {
+  const MARKED_SRC = 'https://cdn.jsdelivr.net/npm/marked@12/marked.min.js';
 
-function loadScript(src) {
-  return new Promise((resolve, reject) => {
-    const s = document.createElement('script');
-    s.src = src;
-    s.onload = resolve;
-    s.onerror = reject;
-    document.head.appendChild(s);
-  });
-}
+  function loadScript(src) {
+    return new Promise((res, rej) => {
+      if (document.querySelector(`script[src="${src}"]`)) { res(); return; }
+      const s = document.createElement('script');
+      s.src = src;
+      s.onload = res;
+      s.onerror = rej;
+      document.head.appendChild(s);
+    });
+  }
 
-function parseCallouts(html) {
-  return html.replace(/<blockquote>\s*<p>\[!(INFO|WARNING|TIP|DANGER)\]\s*(.*?)<\/p>([\s\S]*?)<\/blockquote>/gi, (_, type, title, body) => {
-    const map = {
-      INFO: { cls: 'info', icon: 'ℹ️' },
-      WARNING: { cls: 'warning', icon: '⚠️' },
-      TIP: { cls: 'tip', icon: '💡' },
-      DANGER: { cls: 'danger', icon: '🚨' }
+  function parseFrontmatter(raw) {
+    const fm = {};
+    let body = raw;
+    if (raw.startsWith('---')) {
+      const end = raw.indexOf('---', 3);
+      if (end !== -1) {
+        const block = raw.slice(3, end).trim();
+        block.split('\n').forEach(line => {
+          const colon = line.indexOf(':');
+          if (colon === -1) return;
+          const k = line.slice(0, colon).trim();
+          const v = line.slice(colon + 1).trim().replace(/^['"]|['"]$/g, '');
+          if (k) fm[k] = v;
+        });
+        body = raw.slice(end + 3).trim();
+      }
+    }
+    return { fm, body };
+  }
+
+  function applyCallouts(html) {
+    return html.replace(
+      /<blockquote>\s*<p>\[!(INFO|WARNING|TIP|DANGER)\]([^<]*)<\/p>([\s\S]*?)<\/blockquote>/gi,
+      (_, type, title, rest) => {
+        const map = {
+          INFO:    { cls: 'info',    icon: 'fa-solid fa-circle-info' },
+          WARNING: { cls: 'warning', icon: 'fa-solid fa-triangle-exclamation' },
+          TIP:     { cls: 'tip',     icon: 'fa-solid fa-lightbulb' },
+          DANGER:  { cls: 'danger',  icon: 'fa-solid fa-circle-xmark' }
+        };
+        const t = map[type.toUpperCase()] || map.INFO;
+        const inner = rest.replace(/<\/?p>/g, '').trim();
+        return `<div class="callout ${t.cls}">
+          <i class="callout-ico ${t.icon}"></i>
+          <div class="callout-content">${title.trim() ? `<strong>${title.trim()}</strong>` : ''}${inner}</div>
+        </div>`;
+      }
+    );
+  }
+
+  function applyGallery(html) {
+    return html.replace(/<!--gallery-->([\s\S]*?)<!--\/gallery-->/gi, (_, c) => {
+      return `<div class="img-grid">${c}</div>`;
+    });
+  }
+
+  async function renderMd(raw) {
+    await loadScript(MARKED_SRC);
+    marked.setOptions({ breaks: true, gfm: true });
+    let html = marked.parse(raw);
+    html = applyCallouts(html);
+    html = applyGallery(html);
+    return html;
+  }
+
+  async function buildNormHeader(fm, file) {
+    const headerEl = document.getElementById('norm-header');
+    if (!headerEl) return;
+
+    const statusMap = {
+      'Validée': 'badge-green',
+      'En cours': 'badge-orange',
+      'Dépréciée': 'badge-red'
     };
-    const t = map[type.toUpperCase()] || map.INFO;
-    return `<div class="callout ${t.cls}"><span class="callout-icon">${t.icon}</span><div class="callout-body"><strong>${title}</strong>${body}</div></div>`;
-  });
-}
+    const badgeCls = statusMap[fm.status] || 'badge-grey';
 
-function parseImageGrid(html) {
-  return html.replace(/<!--gallery-->([\s\S]*?)<!--\/gallery-->/gi, (_, content) => {
-    return `<div class="img-grid">${content}</div>`;
-  });
-}
-
-async function renderMarkdown(mdContent) {
-  if (typeof marked === 'undefined') {
-    await loadScript(MARKED_CDN);
-  }
-
-  marked.setOptions({
-    breaks: true,
-    gfm: true
-  });
-
-  let html = marked.parse(mdContent);
-  html = parseCallouts(html);
-  html = parseImageGrid(html);
-  return html;
-}
-
-async function loadNormPage() {
-  const params = new URLSearchParams(window.location.search);
-  const normFile = params.get('norm');
-
-  if (!normFile) {
-    window.location.href = 'index.html';
-    return;
-  }
-
-  const contentEl = document.getElementById('norm-body');
-  const headerEl = document.getElementById('norm-header');
-
-  try {
-    const resp = await fetch(`norms/${normFile}`);
-    if (!resp.ok) throw new Error('Fichier introuvable');
-
-    const md = await resp.text();
-    const lines = md.split('\n');
-    const frontmatter = {};
-    let bodyStart = 0;
-
-    if (lines[0] === '---') {
-      let i = 1;
-      while (i < lines.length && lines[i] !== '---') {
-        const [key, ...val] = lines[i].split(':');
-        if (key && val.length) frontmatter[key.trim()] = val.join(':').trim();
-        i++;
-      }
-      bodyStart = i + 1;
-    }
-
-    const body = lines.slice(bodyStart).join('\n');
-    const html = await renderMarkdown(body);
-
-    if (headerEl) {
-      headerEl.innerHTML = `
-        <div class="norm-id">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-          ${frontmatter.id || normFile.replace('.md', '')}
-          ${frontmatter.status ? `<span class="tag tag-vert">${frontmatter.status}</span>` : ''}
-        </div>
-        <h1>${frontmatter.title || 'Norme'}</h1>
-        <div class="norm-meta">
-          ${frontmatter.authors ? `<span>✍️ ${frontmatter.authors}</span>` : ''}
-          ${frontmatter.date ? `<span>📅 ${formatDate(frontmatter.date)}</span>` : ''}
-          ${frontmatter.category ? `<span>🏷️ ${frontmatter.category}</span>` : ''}
-        </div>
-      `;
-    }
-
-    if (contentEl) {
-      contentEl.innerHTML = html;
-
-      if (frontmatter.authors) {
-        const authors = frontmatter.authors.split(',').map(a => a.trim());
-        contentEl.innerHTML += `
-          <div class="norm-authors">
-            <h4>Auteurs</h4>
-            <div class="author-list">
-              ${authors.map(a => `
-                <div class="author-chip">
-                  <div class="avatar">${a[0] || '?'}</div>
-                  ${a}
-                </div>
-              `).join('')}
-            </div>
-          </div>
-        `;
-      }
-
-      buildTOC();
-    }
-
-    if (frontmatter.title) {
-      document.title = `${frontmatter.title} — BTE France Normes`;
-    }
-
-    updateBreadcrumb(frontmatter);
-    buildNavButtons(normFile);
-
-  } catch (err) {
-    contentEl.innerHTML = `
-      <div class="callout danger">
-        <span class="callout-icon">🚨</span>
-        <div class="callout-body">
-          <strong>Erreur de chargement</strong>
-          Impossible de charger cette norme. ${err.message}
-        </div>
+    headerEl.innerHTML = `
+      <div class="article-breadcrumb">
+        <a href="${url('index.html')}">Accueil</a>
+        <i class="fa-solid fa-chevron-right"></i>
+        <a href="${url('norm-index.html')}">Index</a>
+        <i class="fa-solid fa-chevron-right"></i>
+        <span>${fm.id || file.replace('.md','')}</span>
+      </div>
+      <div class="article-id">${fm.id || ''}</div>
+      <h1>${fm.title || 'Norme'}</h1>
+      <div class="article-meta">
+        ${fm.status ? `<span><span class="badge ${badgeCls}"><i class="fa-solid fa-circle-dot"></i> ${fm.status}</span></span>` : ''}
+        ${fm.authors ? `<span><i class="fa-solid fa-user-pen"></i> ${fm.authors}</span>` : ''}
+        ${fm.date ? `<span><i class="fa-regular fa-calendar"></i> ${fmtDate(fm.date)}</span>` : ''}
+        ${fm.category ? `<span><i class="fa-solid fa-folder"></i> ${fm.category}</span>` : ''}
       </div>
     `;
   }
-}
 
-function buildTOC() {
-  const tocEl = document.getElementById('toc');
-  if (!tocEl) return;
+  function buildTOC(bodyEl) {
+    const tocEl = document.getElementById('toc');
+    if (!tocEl || !bodyEl) return;
 
-  const headings = document.querySelectorAll('#norm-body h2, #norm-body h3');
-  if (!headings.length) return;
+    const headings = bodyEl.querySelectorAll('h2, h3');
+    if (!headings.length) {
+      tocEl.innerHTML = '<li><span class="sidebar-section-label">Aucune section</span></li>';
+      return;
+    }
 
-  const items = [];
-  headings.forEach((h, i) => {
-    const id = `heading-${i}`;
-    h.id = id;
-    items.push({ id, text: h.textContent, level: h.tagName });
-  });
-
-  tocEl.innerHTML = items.map(item => `
-    <li>
-      <a href="#${item.id}" style="${item.level === 'H3' ? 'padding-left: 32px;' : ''}">
-        ${item.text}
-      </a>
-    </li>
-  `).join('');
-
-  const links = tocEl.querySelectorAll('a');
-  const observer = new IntersectionObserver(entries => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        links.forEach(l => l.classList.remove('active'));
-        const active = tocEl.querySelector(`a[href="#${entry.target.id}"]`);
-        if (active) active.classList.add('active');
-      }
+    tocEl.innerHTML = '';
+    headings.forEach((h, i) => {
+      const id = 'section-' + i;
+      h.id = id;
+      const li = document.createElement('li');
+      const a = document.createElement('a');
+      a.href = '#' + id;
+      a.textContent = h.textContent;
+      if (h.tagName === 'H3') a.classList.add('sub');
+      li.appendChild(a);
+      tocEl.appendChild(li);
     });
-  }, { rootMargin: '-20% 0px -70% 0px' });
 
-  headings.forEach(h => observer.observe(h));
-}
+    const links = tocEl.querySelectorAll('a');
+    const obs = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          links.forEach(l => l.classList.remove('active'));
+          const al = tocEl.querySelector(`a[href="#${e.target.id}"]`);
+          if (al) al.classList.add('active');
+        }
+      });
+    }, { rootMargin: '-10% 0px -80% 0px' });
 
-function updateBreadcrumb(fm) {
-  const bc = document.getElementById('breadcrumb');
-  if (!bc || !fm.id) return;
+    headings.forEach(h => obs.observe(h));
+  }
 
-  const parts = fm.id.split('.');
-  let crumbs = `<a href="index.html">Accueil</a>`;
-  crumbs += `<span class="breadcrumb-sep">›</span>`;
-  crumbs += `<a href="norm-index.html">Index</a>`;
-  crumbs += `<span class="breadcrumb-sep">›</span>`;
-  crumbs += `<span>${fm.id}: ${fm.title || ''}</span>`;
+  function buildAuthors(fm, bodyEl) {
+    if (!fm.authors || !bodyEl) return;
+    const authors = fm.authors.split(',').map(a => a.trim()).filter(Boolean);
+    const block = document.createElement('div');
+    block.className = 'authors-block';
+    block.innerHTML = `
+      <h4>Auteurs</h4>
+      <div class="author-chips">
+        ${authors.map(a => `
+          <div class="author-chip">
+            <div class="ava">${a.charAt(0).toUpperCase()}</div>
+            ${a}
+          </div>
+        `).join('')}
+      </div>
+    `;
+    bodyEl.appendChild(block);
+  }
 
-  bc.innerHTML = crumbs;
-}
+  function buildArticleNav(file) {
+    const navEl = document.getElementById('article-nav');
+    if (!navEl) return;
+    const { prev, next } = getNeighbours(file);
 
-function buildNavButtons(currentFile) {
-  const allNorms = [];
-  Object.values(NORMS_DATA).forEach(cat => {
-    cat.items.forEach(item => allNorms.push(item));
-  });
+    navEl.innerHTML = `
+      ${prev ? `
+        <a href="${url('norm-viewer.html')}?norm=${prev.file}" class="art-nav-btn prev">
+          <i class="fa-solid fa-arrow-left"></i>
+          <div>
+            <small>Précédent</small>
+            <strong>${prev.id} — ${prev.title}</strong>
+          </div>
+        </a>
+      ` : '<div></div>'}
+      ${next ? `
+        <a href="${url('norm-viewer.html')}?norm=${next.file}" class="art-nav-btn next">
+          <div>
+            <small>Suivant</small>
+            <strong>${next.id} — ${next.title}</strong>
+          </div>
+          <i class="fa-solid fa-arrow-right"></i>
+        </a>
+      ` : '<div></div>'}
+    `;
+  }
 
-  const idx = allNorms.findIndex(n => n.file === currentFile);
-  const prev = idx > 0 ? allNorms[idx - 1] : null;
-  const next = idx < allNorms.length - 1 ? allNorms[idx + 1] : null;
+  async function loadNormPage() {
+    const params = new URLSearchParams(window.location.search);
+    const normFile = params.get('norm');
+    const headerEl = document.getElementById('norm-header');
+    const bodyEl = document.getElementById('norm-body');
 
-  const navEl = document.getElementById('norm-nav-bottom');
-  if (!navEl) return;
+    if (!normFile || !bodyEl) {
+      window.location.href = url('index.html');
+      return;
+    }
 
-  navEl.innerHTML = `
-    ${prev ? `
-      <a href="norm-viewer.html?norm=${prev.file}" class="norm-nav-btn prev">
-        <span>←</span>
-        <div>
-          <small>Précédent</small>
-          <span>${prev.id}: ${prev.title}</span>
+    bodyEl.innerHTML = `<div class="loading-state"><div class="spinner"></div><p>Chargement...</p></div>`;
+
+    const fetchUrl = url('norms/' + normFile);
+
+    try {
+      const resp = await fetch(fetchUrl);
+      if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+      const raw = await resp.text();
+      const { fm, body } = parseFrontmatter(raw);
+
+      await buildNormHeader(fm, normFile);
+
+      const html = await renderMd(body);
+      bodyEl.innerHTML = html;
+
+      buildAuthors(fm, bodyEl);
+      buildTOC(bodyEl);
+      buildArticleNav(normFile);
+
+      if (fm.title) document.title = `${fm.id} — ${fm.title} · BTE France Normes`;
+
+    } catch (err) {
+      if (headerEl) headerEl.innerHTML = '';
+      bodyEl.innerHTML = `
+        <div class="error-state">
+          <i class="fa-solid fa-file-circle-xmark"></i>
+          <h3>Norme introuvable</h3>
+          <p>Le fichier <code>norms/${normFile}</code> n'existe pas encore ou n'a pas pu être chargé.</p>
+          <p style="margin-top:12px"><a href="${url('norm-index.html')}">Retour à l'index</a></p>
         </div>
-      </a>
-    ` : '<div></div>'}
-    ${next ? `
-      <a href="norm-viewer.html?norm=${next.file}" class="norm-nav-btn next">
-        <div>
-          <small>Suivant</small>
-          <span>${next.id}: ${next.title}</span>
-        </div>
-        <span>→</span>
-      </a>
-    ` : '<div></div>'}
-  `;
-}
+      `;
+    }
+  }
 
-function formatDate(d) {
-  return new Date(d).toLocaleDateString('fr-FR', { year: 'numeric', month: 'long', day: 'numeric' });
-}
+  window.loadNormPage = loadNormPage;
+})();
