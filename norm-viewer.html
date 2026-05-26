@@ -111,13 +111,12 @@
   function parseFrontmatter(raw) {
     var fm = {};
     var body = raw;
-    var trimmed = raw.trimStart ? raw.trimStart() : raw.replace(/^\s+/, '');
-    if (trimmed.startsWith('---')) {
+    var trimmed = raw.replace(/^\s+/, '');
+    if (trimmed.indexOf('---') === 0) {
       var start = raw.indexOf('---');
       var end   = raw.indexOf('---', start + 3);
       if (end !== -1) {
-        var block = raw.slice(start + 3, end).trim();
-        block.split('\n').forEach(function (line) {
+        raw.slice(start + 3, end).trim().split('\n').forEach(function (line) {
           var colon = line.indexOf(':');
           if (colon === -1) return;
           var k = line.slice(0, colon).trim();
@@ -131,34 +130,64 @@
   }
 
   function applyCallouts(html) {
-   return html.replace(
-    /<blockquote>\s*<p>\[!(INFO|WARNING|TIP|DANGER)\](.*?)<\/p>([\s\S]*?)<\/blockquote>/gi,
-    function (_, type, title, rest) {
+    var div = document.createElement('div');
+    div.innerHTML = html;
+
+    var blockquotes = div.querySelectorAll('blockquote');
+    blockquotes.forEach(function (bq) {
+      var firstP = bq.querySelector('p');
+      if (!firstP) return;
+
+      var text = firstP.textContent || '';
+      var match = text.match(/^\[!(INFO|WARNING|TIP|DANGER)\]\s*(.*)/i);
+      if (!match) return;
+
+      var type  = match[1].toUpperCase();
+      var title = match[2].trim();
+
       var map = {
         INFO:    { cls: 'info',    icon: 'fa-solid fa-circle-info' },
         WARNING: { cls: 'warning', icon: 'fa-solid fa-triangle-exclamation' },
         TIP:     { cls: 'tip',     icon: 'fa-solid fa-lightbulb' },
         DANGER:  { cls: 'danger',  icon: 'fa-solid fa-circle-xmark' }
       };
-      var t     = map[type.toUpperCase()] || map.INFO;
-      var inner = rest
-        .replace(/<blockquote>/gi, '')
-        .replace(/<\/blockquote>/gi, '')
-        .replace(/^\s*<p>|<\/p>\s*$/g, '')
-        .trim();
-      return '<div class="callout ' + t.cls + '">'
-        + '<i class="callout-ico ' + t.icon + '"></i>'
+      var t = map[type] || map.INFO;
+
+      firstP.remove();
+
+      var remaining = bq.innerHTML.trim();
+
+      var callout = document.createElement('div');
+      callout.className = 'callout ' + t.cls;
+      callout.innerHTML =
+        '<i class="callout-ico ' + t.icon + '"></i>'
         + '<div class="callout-content">'
-        + (title.trim() ? '<strong>' + title.trim() + '</strong>' : '')
-        + (inner ? '<p style="margin:4px 0 0">' + inner + '</p>' : '')
-        + '</div></div>';
-    }
-  );
-}
+        + (title ? '<strong>' + title + '</strong>' : '')
+        + (remaining ? '<div>' + remaining + '</div>' : '')
+        + '</div>';
+
+      bq.parentNode.replaceChild(callout, bq);
+    });
+
+    return div.innerHTML;
+  }
 
   function applyGallery(html) {
     return html.replace(/<!--gallery-->([\s\S]*?)<!--\/gallery-->/gi, function (_, c) {
       return '<div class="img-grid">' + c + '</div>';
+    });
+  }
+
+  function fixImagePaths(bodyEl, normFile) {
+    var folder = normFile.substring(0, normFile.lastIndexOf('/'));
+    var base   = RAW_BASE + '/norms/' + folder + '/images/';
+    var imgs   = bodyEl.querySelectorAll('img');
+    imgs.forEach(function (img) {
+      var src = img.getAttribute('src') || '';
+      if (src.indexOf('http') === 0 || src.indexOf('//') === 0) return;
+      if (src.indexOf('images/') === 0) {
+        img.setAttribute('src', base + src.replace('images/', ''));
+      }
     });
   }
 
@@ -275,12 +304,13 @@
         buildHeader(fm, normFile);
 
         return loadScript(MARKED_SRC).then(function () {
-          marked.setOptions({ breaks: true, gfm: true });
+          marked.setOptions({ breaks: false, gfm: true });
           var html = marked.parse(body);
           html = applyCallouts(html);
           html = applyGallery(html);
           bodyEl.innerHTML = html;
 
+          fixImagePaths(bodyEl, normFile);
           buildAuthors(fm, bodyEl);
           buildTOC(bodyEl);
           buildArticleNav(normFile);
