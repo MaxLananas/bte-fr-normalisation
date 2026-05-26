@@ -5,131 +5,161 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Index des Normes — BTE France</title>
   <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
 <body>
 
 <nav>
   <a class="nav-logo" href="index.html">
-    <svg width="28" height="28" viewBox="0 0 32 32" fill="none">
-      <rect width="32" height="32" rx="6" fill="#1a3a5c"/>
-      <rect x="2" y="2" width="10" height="28" rx="2" fill="#002395"/>
-      <rect x="12" y="2" width="8" height="28" fill="#EDEDED"/>
-      <rect x="20" y="2" width="10" height="28" rx="2" fill="#ED2939"/>
-    </svg>
-    BTE France <span>Normes</span>
+    <img src="assets/img/btefrance.gif" alt="BTE France">
+    <div class="nav-logo-text">BTE France<span>Normalisation</span></div>
   </a>
+  <div class="nav-sep"></div>
   <ul class="nav-links">
-    <li><a href="index.html">Accueil</a></li>
-    <li><a href="norm-index.html" class="active">Index</a></li>
-    <li><a href="about.html">À propos</a></li>
-    <li>
-      <a href="https://discord.gg/buildtheearthfrance" target="_blank" class="discord-btn">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 00-4.885-1.515.074.074 0 00-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 00-5.487 0 12.64 12.64 0 00-.617-1.25.077.077 0 00-.079-.037A19.736 19.736 0 003.677 4.37a.07.07 0 00-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 00.031.057 19.9 19.9 0 005.993 3.03.078.078 0 00.084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 00-.041-.106 13.107 13.107 0 01-1.872-.892.077.077 0 01-.008-.128 10.2 10.2 0 00.372-.292.074.074 0 01.077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 01.078.01c.12.098.246.198.373.292a.077.077 0 01-.006.127 12.299 12.299 0 01-1.873.892.077.077 0 00-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 00.084.028 19.839 19.839 0 006.002-3.03.077.077 0 00.032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 00-.031-.03z"/></svg>
-        Discord
-      </a>
-    </li>
+    <li><a href="index.html"><i class="fa-solid fa-house"></i> Accueil</a></li>
+    <li><a href="norm-index.html" class="active"><i class="fa-solid fa-list"></i> Index</a></li>
+    <li><a href="about.html"><i class="fa-solid fa-circle-info"></i> À propos</a></li>
   </ul>
+  <div class="nav-right">
+    <a href="https://discord.gg/zdsG6MN99h" target="_blank" class="nav-btn nav-btn-discord">
+      <i class="fa-brands fa-discord"></i> Discord
+    </a>
+    <a href="https://github.com/MaxLananas/bte-fr-normalisation" target="_blank" class="nav-btn nav-btn-github">
+      <i class="fa-brands fa-github"></i> GitHub
+    </a>
+  </div>
 </nav>
 
-<section class="hero" style="padding: 50px 2rem 44px;">
-  <div class="hero-badge">Index complet</div>
-  <h1>Index des <span>Normes</span></h1>
-  <p>Toutes les normes de construction BTE France, classées par catégorie.</p>
+<section class="hero" style="padding:44px 24px 40px;">
+  <div class="hero-eyebrow"><i class="fa-solid fa-list"></i> Index complet</div>
+  <h1>Index des <em>Normes</em></h1>
+  <p class="hero-desc">Toutes les normes de construction BTE France, classées par catégorie.</p>
 </section>
 
-<div class="container section">
-  <div class="search-bar">
-    <span class="search-icon">🔍</span>
-    <input type="text" id="search-input" placeholder="Rechercher une norme..." autocomplete="off">
-  </div>
+<div class="container page-body">
+  <div class="index-page-layout">
 
-  <div id="index-content"></div>
+    <aside class="index-toc">
+      <div class="index-toc-head"><i class="fa-solid fa-layer-group"></i> Catégories</div>
+      <ul class="index-toc-list" id="cat-toc"></ul>
+    </aside>
+
+    <div class="index-main">
+      <div class="index-search">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input type="text" id="search" placeholder="Rechercher une norme..." autocomplete="off">
+      </div>
+      <div id="index-body"></div>
+    </div>
+
+  </div>
 </div>
 
 <footer>
-  <div class="container">
+  <div class="footer-inner">
     <div class="footer-grid">
       <div class="footer-brand">
-        <h3>BTE France — Normalisation</h3>
-        <p>Un projet communautaire open-source pour standardiser la construction dans Build The Earth France.</p>
+        <img src="assets/img/btefrance.gif" alt="BTE France">
+        <div class="footer-brand-name">BTE France — Normalisation</div>
+        <p>Un projet communautaire pour standardiser la construction dans Build The Earth France.</p>
       </div>
-      <div class="footer-links">
+      <div class="footer-col">
         <h4>Navigation</h4>
         <ul>
-          <li><a href="index.html">Accueil</a></li>
-          <li><a href="norm-index.html">Index</a></li>
-          <li><a href="about.html">À propos</a></li>
+          <li><a href="index.html"><i class="fa-solid fa-house"></i> Accueil</a></li>
+          <li><a href="norm-index.html"><i class="fa-solid fa-list"></i> Index</a></li>
+          <li><a href="about.html"><i class="fa-solid fa-circle-info"></i> À propos</a></li>
         </ul>
       </div>
-      <div class="footer-links">
+      <div class="footer-col">
+        <h4>Communauté</h4>
+        <ul>
+          <li><a href="https://discord.gg/zdsG6MN99h" target="_blank"><i class="fa-brands fa-discord"></i> Discord BTE France</a></li>
+          <li><a href="https://discord.gg/ZjTeef8da6" target="_blank"><i class="fa-brands fa-discord"></i> Discord BTE Global</a></li>
+          <li><a href="https://github.com/MaxLananas/bte-fr-normalisation" target="_blank"><i class="fa-brands fa-github"></i> GitHub</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
         <h4>Liens</h4>
         <ul>
-          <li><a href="https://discord.gg/buildtheearthfrance" target="_blank">Discord</a></li>
-          <li><a href="https://github.com/" target="_blank">GitHub</a></li>
+          <li><a href="https://buildtheearth.net" target="_blank"><i class="fa-solid fa-globe"></i> BTE Global</a></li>
+          <li><a href="norm-viewer.html?norm=N1/N1.2.md"><i class="fa-solid fa-pen-to-square"></i> Contribuer</a></li>
         </ul>
       </div>
     </div>
     <div class="footer-bottom">
-      <span>© 2025 BTE France Normalisation</span>
+      <span>Fait par MaxLananas en 2026 — Open source</span>
+      <span>Build The Earth France</span>
     </div>
   </div>
 </footer>
 
 <script src="assets/js/main.js"></script>
 <script>
-  function renderIndex(filter = '') {
-    const container = document.getElementById('index-content');
-    const lf = filter.toLowerCase().trim();
-    container.innerHTML = '';
+  const toc = document.getElementById('cat-toc');
+  const body = document.getElementById('index-body');
 
-    Object.entries(NORMS_DATA).forEach(([key, cat]) => {
-      const visible = cat.items.filter(item =>
-        !lf || item.title.toLowerCase().includes(lf) || item.id.toLowerCase().includes(lf)
+  function render(filter) {
+    const lf = (filter || '').toLowerCase().trim();
+    body.innerHTML = '';
+
+    NORMS_DATA.forEach(cat => {
+      const visible = cat.items.filter(i =>
+        !lf || i.title.toLowerCase().includes(lf) || i.id.toLowerCase().includes(lf)
       );
+      if (lf && !visible.length) return;
 
-      if (!visible.length && lf) return;
-
-      const section = document.createElement('div');
-      section.className = 'index-section';
-      section.id = key;
-
-      section.innerHTML = `
-        <div class="index-section-header">
-          <span class="index-section-num">${key}</span>
-          <span class="index-section-title">${cat.icon} ${cat.title}</span>
+      const list = lf ? visible : cat.items;
+      const sec = document.createElement('div');
+      sec.className = 'index-section';
+      sec.id = cat.id;
+      sec.innerHTML = `
+        <div class="index-section-head">
+          <span class="index-section-num">${cat.id}</span>
+          <h3>${cat.title}</h3>
+          <i class="${cat.icon}"></i>
         </div>
         <ul class="index-list">
-          ${(lf ? visible : cat.items).map(item => `
+          ${list.map(i => `
             <li>
-              <a href="norm-viewer.html?norm=${item.file}">
-                <span class="item-num">${item.id}</span>
-                <span>${item.title}</span>
-                <span class="arrow">→</span>
+              <a href="${url('norm-viewer.html')}?norm=${i.file}">
+                <span class="norm-num">${i.id}</span>
+                <span>${i.title}</span>
+                <i class="fa-solid fa-chevron-right norm-arrow"></i>
               </a>
             </li>
           `).join('')}
         </ul>
       `;
-
-      container.appendChild(section);
+      body.appendChild(sec);
     });
 
-    if (!container.children.length) {
-      container.innerHTML = `<div class="loading"><p>Aucune norme trouvée pour "<strong>${filter}</strong>"</p></div>`;
+    if (!body.children.length) {
+      body.innerHTML = `<div class="loading-state"><i class="fa-solid fa-magnifying-glass" style="font-size:1.5rem;color:var(--gris-moyen);display:block;margin-bottom:12px;"></i><p>Aucun résultat pour "<strong>${filter}</strong>"</p></div>`;
     }
   }
 
-  renderIndex();
-
-  document.getElementById('search-input').addEventListener('input', e => {
-    renderIndex(e.target.value);
+  NORMS_DATA.forEach(cat => {
+    const li = document.createElement('li');
+    const a = document.createElement('a');
+    a.href = '#' + cat.id;
+    a.innerHTML = `<i class="${cat.icon}"></i> ${cat.id} — ${cat.title}`;
+    a.addEventListener('click', e => {
+      e.preventDefault();
+      document.getElementById(cat.id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+    li.appendChild(a);
+    toc.appendChild(li);
   });
+
+  render();
+
+  document.getElementById('search').addEventListener('input', e => render(e.target.value));
 
   if (window.location.hash) {
     setTimeout(() => {
-      const el = document.querySelector(window.location.hash);
-      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }, 100);
+      document.querySelector(window.location.hash)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 80);
   }
 </script>
 
