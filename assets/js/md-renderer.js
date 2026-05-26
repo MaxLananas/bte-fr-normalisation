@@ -15,10 +15,11 @@
   function parseFrontmatter(raw) {
     const fm = {};
     let body = raw;
-    if (raw.startsWith('---')) {
-      const end = raw.indexOf('---', 3);
+    if (raw.trimStart().startsWith('---')) {
+      const start = raw.indexOf('---');
+      const end = raw.indexOf('---', start + 3);
       if (end !== -1) {
-        const block = raw.slice(3, end).trim();
+        const block = raw.slice(start + 3, end).trim();
         block.split('\n').forEach(line => {
           const colon = line.indexOf(':');
           if (colon === -1) return;
@@ -46,7 +47,7 @@
         const inner = rest.replace(/<\/?p>/g, '').trim();
         return `<div class="callout ${t.cls}">
           <i class="callout-ico ${t.icon}"></i>
-          <div class="callout-content">${title.trim() ? `<strong>${title.trim()}</strong>` : ''}${inner}</div>
+          <div class="callout-content">${title.trim() ? `<strong>${title.trim()}</strong>` : ''}${inner ? '<p style="margin:4px 0 0;">' + inner + '</p>' : ''}</div>
         </div>`;
       }
     );
@@ -67,31 +68,31 @@
     return html;
   }
 
-  async function buildNormHeader(fm, file) {
+  function buildNormHeader(fm, file) {
     const headerEl = document.getElementById('norm-header');
     if (!headerEl) return;
 
     const statusMap = {
-      'Validée': 'badge-green',
-      'En cours': 'badge-orange',
+      'Validée':   'badge-green',
+      'En cours':  'badge-orange',
       'Dépréciée': 'badge-red'
     };
     const badgeCls = statusMap[fm.status] || 'badge-grey';
 
     headerEl.innerHTML = `
       <div class="article-breadcrumb">
-        <a href="${url('index.html')}">Accueil</a>
+        <a href="${pageUrl('index.html')}">Accueil</a>
         <i class="fa-solid fa-chevron-right"></i>
-        <a href="${url('norm-index.html')}">Index</a>
+        <a href="${pageUrl('norm-index.html')}">Index</a>
         <i class="fa-solid fa-chevron-right"></i>
-        <span>${fm.id || file.replace('.md','')}</span>
+        <span>${fm.id || file.replace('.md', '')}</span>
       </div>
       <div class="article-id">${fm.id || ''}</div>
       <h1>${fm.title || 'Norme'}</h1>
       <div class="article-meta">
-        ${fm.status ? `<span><span class="badge ${badgeCls}"><i class="fa-solid fa-circle-dot"></i> ${fm.status}</span></span>` : ''}
-        ${fm.authors ? `<span><i class="fa-solid fa-user-pen"></i> ${fm.authors}</span>` : ''}
-        ${fm.date ? `<span><i class="fa-regular fa-calendar"></i> ${fmtDate(fm.date)}</span>` : ''}
+        ${fm.status   ? `<span><span class="badge ${badgeCls}"><i class="fa-solid fa-circle-dot"></i> ${fm.status}</span></span>` : ''}
+        ${fm.authors  ? `<span><i class="fa-solid fa-user-pen"></i> ${fm.authors}</span>` : ''}
+        ${fm.date     ? `<span><i class="fa-regular fa-calendar"></i> ${fmtDate(fm.date)}</span>` : ''}
         ${fm.category ? `<span><i class="fa-solid fa-folder"></i> ${fm.category}</span>` : ''}
       </div>
     `;
@@ -160,7 +161,7 @@
 
     navEl.innerHTML = `
       ${prev ? `
-        <a href="${url('norm-viewer.html')}?norm=${prev.file}" class="art-nav-btn prev">
+        <a href="${pageUrl('norm-viewer.html')}?norm=${prev.file}" class="art-nav-btn prev">
           <i class="fa-solid fa-arrow-left"></i>
           <div>
             <small>Précédent</small>
@@ -169,7 +170,7 @@
         </a>
       ` : '<div></div>'}
       ${next ? `
-        <a href="${url('norm-viewer.html')}?norm=${next.file}" class="art-nav-btn next">
+        <a href="${pageUrl('norm-viewer.html')}?norm=${next.file}" class="art-nav-btn next">
           <div>
             <small>Suivant</small>
             <strong>${next.id} — ${next.title}</strong>
@@ -181,27 +182,29 @@
   }
 
   async function loadNormPage() {
-    const params = new URLSearchParams(window.location.search);
+    const params   = new URLSearchParams(window.location.search);
     const normFile = params.get('norm');
     const headerEl = document.getElementById('norm-header');
-    const bodyEl = document.getElementById('norm-body');
+    const bodyEl   = document.getElementById('norm-body');
 
     if (!normFile || !bodyEl) {
-      window.location.href = url('index.html');
+      window.location.href = pageUrl('index.html');
       return;
     }
 
     bodyEl.innerHTML = `<div class="loading-state"><div class="spinner"></div><p>Chargement...</p></div>`;
+    if (headerEl) headerEl.innerHTML = '';
 
-    const fetchUrl = url('norms/' + normFile);
+    const fetchTarget = normUrl(normFile);
 
     try {
-      const resp = await fetch(fetchUrl);
+      const resp = await fetch(fetchTarget);
       if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+
       const raw = await resp.text();
       const { fm, body } = parseFrontmatter(raw);
 
-      await buildNormHeader(fm, normFile);
+      buildNormHeader(fm, normFile);
 
       const html = await renderMd(body);
       bodyEl.innerHTML = html;
@@ -210,7 +213,9 @@
       buildTOC(bodyEl);
       buildArticleNav(normFile);
 
-      if (fm.title) document.title = `${fm.id} — ${fm.title} · BTE France Normes`;
+      if (fm.title) {
+        document.title = `${fm.id} — ${fm.title} · BTE France Normes`;
+      }
 
     } catch (err) {
       if (headerEl) headerEl.innerHTML = '';
@@ -219,7 +224,11 @@
           <i class="fa-solid fa-file-circle-xmark"></i>
           <h3>Norme introuvable</h3>
           <p>Le fichier <code>norms/${normFile}</code> n'existe pas encore ou n'a pas pu être chargé.</p>
-          <p style="margin-top:12px"><a href="${url('norm-index.html')}">Retour à l'index</a></p>
+          <p style="margin-top:16px">
+            <a href="${pageUrl('norm-index.html')}">
+              <i class="fa-solid fa-arrow-left"></i> Retour à l'index
+            </a>
+          </p>
         </div>
       `;
     }
