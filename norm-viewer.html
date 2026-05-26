@@ -95,12 +95,12 @@
 <script src="assets/js/main.js"></script>
 <script>
 (function () {
-  const MARKED_SRC = 'https://cdn.jsdelivr.net/npm/marked@12/marked.min.js';
+  var MARKED_SRC = 'https://cdn.jsdelivr.net/npm/marked@12/marked.min.js';
 
   function loadScript(src) {
-    return new Promise((res, rej) => {
+    return new Promise(function (res, rej) {
       if (document.querySelector('script[src="' + src + '"]')) { res(); return; }
-      const s = document.createElement('script');
+      var s = document.createElement('script');
       s.src = src;
       s.onload = res;
       s.onerror = rej;
@@ -109,37 +109,39 @@
   }
 
   function parseFrontmatter(raw) {
-    const fm = {};
-    let body = raw;
-    if (raw.trimStart().startsWith('---')) {
-      const start = raw.indexOf('---');
-      const end   = raw.indexOf('---', start + 3);
+    var fm = {};
+    var body = raw;
+    var trimmed = raw.trimStart ? raw.trimStart() : raw.replace(/^\s+/, '');
+    if (trimmed.startsWith('---')) {
+      var start = raw.indexOf('---');
+      var end   = raw.indexOf('---', start + 3);
       if (end !== -1) {
-        raw.slice(start + 3, end).trim().split('\n').forEach(line => {
-          const colon = line.indexOf(':');
+        var block = raw.slice(start + 3, end).trim();
+        block.split('\n').forEach(function (line) {
+          var colon = line.indexOf(':');
           if (colon === -1) return;
-          const k = line.slice(0, colon).trim();
-          const v = line.slice(colon + 1).trim().replace(/^['"]|['"]$/g, '');
+          var k = line.slice(0, colon).trim();
+          var v = line.slice(colon + 1).trim().replace(/^['"]|['"]$/g, '');
           if (k) fm[k] = v;
         });
         body = raw.slice(end + 3).trim();
       }
     }
-    return { fm, body };
+    return { fm: fm, body: body };
   }
 
   function applyCallouts(html) {
     return html.replace(
       /<blockquote>\s*<p>\[!(INFO|WARNING|TIP|DANGER)\]([^<]*)<\/p>([\s\S]*?)<\/blockquote>/gi,
       function (_, type, title, rest) {
-        const map = {
+        var map = {
           INFO:    { cls: 'info',    icon: 'fa-solid fa-circle-info' },
           WARNING: { cls: 'warning', icon: 'fa-solid fa-triangle-exclamation' },
           TIP:     { cls: 'tip',     icon: 'fa-solid fa-lightbulb' },
           DANGER:  { cls: 'danger',  icon: 'fa-solid fa-circle-xmark' }
         };
-        const t = map[type.toUpperCase()] || map.INFO;
-        const inner = rest.replace(/<\/?p>/g, '').trim();
+        var t = map[type.toUpperCase()] || map.INFO;
+        var inner = rest.replace(/<\/?p>/g, '').trim();
         return '<div class="callout ' + t.cls + '">'
           + '<i class="callout-ico ' + t.icon + '"></i>'
           + '<div class="callout-content">'
@@ -157,10 +159,10 @@
   }
 
   function buildHeader(fm, file) {
-    const headerEl = document.getElementById('norm-header');
+    var headerEl = document.getElementById('norm-header');
     if (!headerEl) return;
-    const statusMap = { 'Validée': 'badge-green', 'En cours': 'badge-orange', 'Dépréciée': 'badge-red' };
-    const badgeCls  = statusMap[fm.status] || 'badge-grey';
+    var statusMap = { 'Validée': 'badge-green', 'En cours': 'badge-orange', 'Dépréciée': 'badge-red' };
+    var badgeCls  = statusMap[fm.status] || 'badge-grey';
     headerEl.innerHTML =
       '<div class="article-breadcrumb">'
       + '<a href="' + pageUrl('index.html') + '">Accueil</a>'
@@ -180,31 +182,31 @@
   }
 
   function buildTOC(bodyEl) {
-    const tocEl = document.getElementById('toc');
+    var tocEl = document.getElementById('toc');
     if (!tocEl || !bodyEl) return;
-    const headings = bodyEl.querySelectorAll('h2, h3');
+    var headings = bodyEl.querySelectorAll('h2, h3');
     if (!headings.length) {
       tocEl.innerHTML = '<li><span class="sidebar-section-label">Aucune section</span></li>';
       return;
     }
     tocEl.innerHTML = '';
     headings.forEach(function (h, i) {
-      const id = 'section-' + i;
+      var id = 'section-' + i;
       h.id = id;
-      const li = document.createElement('li');
-      const a  = document.createElement('a');
+      var li = document.createElement('li');
+      var a  = document.createElement('a');
       a.href = '#' + id;
       a.textContent = h.textContent;
       if (h.tagName === 'H3') a.classList.add('sub');
       li.appendChild(a);
       tocEl.appendChild(li);
     });
-    const links = tocEl.querySelectorAll('a');
-    const obs = new IntersectionObserver(function (entries) {
+    var links = tocEl.querySelectorAll('a');
+    var obs = new IntersectionObserver(function (entries) {
       entries.forEach(function (e) {
         if (e.isIntersecting) {
           links.forEach(function (l) { l.classList.remove('active'); });
-          const al = tocEl.querySelector('a[href="#' + e.target.id + '"]');
+          var al = tocEl.querySelector('a[href="#' + e.target.id + '"]');
           if (al) al.classList.add('active');
         }
       });
@@ -214,8 +216,8 @@
 
   function buildAuthors(fm, bodyEl) {
     if (!fm.authors || !bodyEl) return;
-    const authors = fm.authors.split(',').map(function (a) { return a.trim(); }).filter(Boolean);
-    const block   = document.createElement('div');
+    var authors = fm.authors.split(',').map(function (a) { return a.trim(); }).filter(Boolean);
+    var block   = document.createElement('div');
     block.className = 'authors-block';
     block.innerHTML = '<h4>Auteurs</h4><div class="author-chips">'
       + authors.map(function (a) {
@@ -226,11 +228,11 @@
   }
 
   function buildArticleNav(file) {
-    const navEl = document.getElementById('article-nav');
+    var navEl = document.getElementById('article-nav');
     if (!navEl) return;
-    const nb   = getNeighbours(file);
-    const prev = nb.prev;
-    const next = nb.next;
+    var nb   = getNeighbours(file);
+    var prev = nb.prev;
+    var next = nb.next;
     navEl.innerHTML =
       (prev
         ? '<a href="' + pageUrl('norm-viewer.html') + '?norm=' + prev.file + '" class="art-nav-btn prev">'
@@ -246,50 +248,54 @@
         : '<div></div>');
   }
 
-  async function run() {
-    const params   = new URLSearchParams(window.location.search);
-    const normFile = params.get('norm');
-    const headerEl = document.getElementById('norm-header');
-    const bodyEl   = document.getElementById('norm-body');
+  function run() {
+    var params   = new URLSearchParams(window.location.search);
+    var normFile = params.get('norm');
+    var headerEl = document.getElementById('norm-header');
+    var bodyEl   = document.getElementById('norm-body');
 
     if (!normFile) { window.location.href = pageUrl('index.html'); return; }
 
-    const target = normUrl(normFile);
+    var target = normUrl(normFile);
 
-    console.log('Fetching:', target);
+    fetch(target)
+      .then(function (resp) {
+        if (!resp.ok) throw new Error('HTTP ' + resp.status);
+        return resp.text();
+      })
+      .then(function (raw) {
+        var parsed = parseFrontmatter(raw);
+        var fm     = parsed.fm;
+        var body   = parsed.body;
 
-    try {
-      const resp = await fetch(target);
-      if (!resp.ok) throw new Error('HTTP ' + resp.status);
-      const raw        = await resp.text();
-      const { fm, body } = parseFrontmatter(raw);
+        buildHeader(fm, normFile);
 
-      buildHeader(fm, normFile);
+        return loadScript(MARKED_SRC).then(function () {
+          marked.setOptions({ breaks: true, gfm: true });
+          var html = marked.parse(body);
+          html = applyCallouts(html);
+          html = applyGallery(html);
+          bodyEl.innerHTML = html;
 
-      await loadScript(MARKED_SRC);
-      marked.setOptions({ breaks: true, gfm: true });
-      let html = marked.parse(body);
-      html = applyCallouts(html);
-      html = applyGallery(html);
-      bodyEl.innerHTML = html;
+          buildAuthors(fm, bodyEl);
+          buildTOC(bodyEl);
+          buildArticleNav(normFile);
 
-      buildAuthors(fm, bodyEl);
-      buildTOC(bodyEl);
-      buildArticleNav(normFile);
-
-      if (fm.title) document.title = fm.id + ' — ' + fm.title + ' · BTE France Normes';
-
-    } catch (err) {
-      if (headerEl) headerEl.innerHTML = '';
-      bodyEl.innerHTML =
-        '<div class="error-state">'
-        + '<i class="fa-solid fa-file-circle-xmark"></i>'
-        + '<h3>Norme introuvable</h3>'
-        + '<p>Impossible de charger <code>norms/' + normFile + '</code>.</p>'
-        + '<p>URL tentée : <code>' + target + '</code></p>'
-        + '<p style="margin-top:16px"><a href="' + pageUrl('norm-index.html') + '"><i class="fa-solid fa-arrow-left"></i> Retour à l\'index</a></p>'
-        + '</div>';
-    }
+          if (fm.title) {
+            document.title = fm.id + ' — ' + fm.title + ' · BTE France Normes';
+          }
+        });
+      })
+      .catch(function (err) {
+        if (headerEl) headerEl.innerHTML = '';
+        bodyEl.innerHTML =
+          '<div class="error-state">'
+          + '<i class="fa-solid fa-file-circle-xmark"></i>'
+          + '<h3>Norme introuvable</h3>'
+          + '<p>Impossible de charger <code>norms/' + normFile + '</code>.</p>'
+          + '<p style="margin-top:16px"><a href="' + pageUrl('norm-index.html') + '"><i class="fa-solid fa-arrow-left"></i> Retour à l\'index</a></p>'
+          + '</div>';
+      });
   }
 
   run();
