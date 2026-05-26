@@ -96,7 +96,7 @@
 
 <script src="assets/js/main.js"></script>
 <script>
-  const toc = document.getElementById('cat-toc');
+  const toc  = document.getElementById('cat-toc');
   const body = document.getElementById('index-body');
 
   function render(filter) {
@@ -110,7 +110,7 @@
       if (lf && !visible.length) return;
 
       const list = lf ? visible : cat.items;
-      const sec = document.createElement('div');
+      const sec  = document.createElement('div');
       sec.className = 'index-section';
       sec.id = cat.id;
       sec.innerHTML = `
@@ -122,7 +122,7 @@
         <ul class="index-list">
           ${list.map(i => `
             <li>
-              <a href="${url('norm-viewer.html')}?norm=${i.file}">
+              <a href="${pageUrl('norm-viewer.html')}?norm=${i.file}">
                 <span class="norm-num">${i.id}</span>
                 <span>${i.title}</span>
                 <i class="fa-solid fa-chevron-right norm-arrow"></i>
@@ -135,13 +135,18 @@
     });
 
     if (!body.children.length) {
-      body.innerHTML = `<div class="loading-state"><i class="fa-solid fa-magnifying-glass" style="font-size:1.5rem;color:var(--gris-moyen);display:block;margin-bottom:12px;"></i><p>Aucun résultat pour "<strong>${filter}</strong>"</p></div>`;
+      body.innerHTML = `
+        <div class="loading-state">
+          <i class="fa-solid fa-magnifying-glass" style="font-size:1.5rem;color:var(--gris-moyen);display:block;margin-bottom:12px;"></i>
+          <p>Aucun résultat pour "<strong>${filter}</strong>"</p>
+        </div>
+      `;
     }
   }
 
   NORMS_DATA.forEach(cat => {
     const li = document.createElement('li');
-    const a = document.createElement('a');
+    const a  = document.createElement('a');
     a.href = '#' + cat.id;
     a.innerHTML = `<i class="${cat.icon}"></i> ${cat.id} — ${cat.title}`;
     a.addEventListener('click', e => {
