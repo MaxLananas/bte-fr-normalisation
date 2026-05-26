@@ -1,16 +1,3 @@
-const BASE_URL = (() => {
-  const p = window.location.pathname;
-  const repo = p.split('/')[1];
-  if (window.location.hostname.includes('github.io') && repo) {
-    return '/' + repo;
-  }
-  return '';
-})();
-
-function url(path) {
-  return BASE_URL + '/' + path.replace(/^\//, '');
-}
-
 const NORMS_DATA = [
   {
     id: 'N1',
@@ -82,12 +69,23 @@ const NORMS_DATA = [
   }
 ];
 
-function getAllItems() {
-  return NORMS_DATA.flatMap(cat => cat.items);
+function resolveBase() {
+  const loc = window.location;
+  const parts = loc.pathname.split('/');
+  parts.pop();
+  return loc.origin + parts.join('/');
 }
 
-function findItem(file) {
-  return getAllItems().find(i => i.file === file) || null;
+function normUrl(file) {
+  return resolveBase() + '/norms/' + file;
+}
+
+function pageUrl(page) {
+  return resolveBase() + '/' + page;
+}
+
+function getAllItems() {
+  return NORMS_DATA.flatMap(cat => cat.items);
 }
 
 function getNeighbours(file) {
@@ -104,7 +102,7 @@ function setActiveNav() {
   document.querySelectorAll('.nav-links a').forEach(a => {
     a.classList.remove('active');
     const h = a.getAttribute('href') || '';
-    if (h.includes(page) || (page === '' && h.includes('index.html'))) {
+    if (h === page || (page === '' && h === 'index.html')) {
       a.classList.add('active');
     }
   });
@@ -112,7 +110,15 @@ function setActiveNav() {
 
 function fmtDate(d) {
   if (!d) return '';
-  return new Date(d).toLocaleDateString('fr-FR', { year: 'numeric', month: 'long', day: 'numeric' });
+  const parts = d.split('/');
+  if (parts.length === 3) {
+    return new Date(`${parts[2]}-${parts[1]}-${parts[0]}`).toLocaleDateString('fr-FR', {
+      year: 'numeric', month: 'long', day: 'numeric'
+    });
+  }
+  return new Date(d).toLocaleDateString('fr-FR', {
+    year: 'numeric', month: 'long', day: 'numeric'
+  });
 }
 
 document.addEventListener('DOMContentLoaded', setActiveNav);
