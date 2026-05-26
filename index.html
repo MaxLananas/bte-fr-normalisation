@@ -1,1 +1,165 @@
-.
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BTE France — Projet de Normalisation</title>
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="icon" href="assets/img/favicon.ico" type="image/x-icon">
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="index.html">
+    <svg width="28" height="28" viewBox="0 0 32 32" fill="none">
+      <rect width="32" height="32" rx="6" fill="#1a3a5c"/>
+      <rect x="2" y="2" width="10" height="28" rx="2" fill="#002395"/>
+      <rect x="12" y="2" width="8" height="28" fill="#EDEDED"/>
+      <rect x="20" y="2" width="10" height="28" rx="2" fill="#ED2939"/>
+    </svg>
+    BTE France <span>Normes</span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="index.html" class="active">Accueil</a></li>
+    <li><a href="norm-index.html">Index</a></li>
+    <li><a href="about.html">À propos</a></li>
+    <li>
+      <a href="https://discord.gg/buildtheearthfrance" target="_blank" class="discord-btn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 00-4.885-1.515.074.074 0 00-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 00-5.487 0 12.64 12.64 0 00-.617-1.25.077.077 0 00-.079-.037A19.736 19.736 0 003.677 4.37a.07.07 0 00-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 00.031.057 19.9 19.9 0 005.993 3.03.078.078 0 00.084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 00-.041-.106 13.107 13.107 0 01-1.872-.892.077.077 0 01-.008-.128 10.2 10.2 0 00.372-.292.074.074 0 01.077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 01.078.01c.12.098.246.198.373.292a.077.077 0 01-.006.127 12.299 12.299 0 01-1.873.892.077.077 0 00-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 00.084.028 19.839 19.839 0 006.002-3.03.077.077 0 00.032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 00-.031-.03z"/></svg>
+        Discord
+      </a>
+    </li>
+  </ul>
+</nav>
+
+<section class="hero">
+  <div class="hero-badge">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10"/></svg>
+    Build The Earth France
+  </div>
+  <h1>Projet de <span>Normalisation</span></h1>
+  <p>Des standards partagés pour construire la France bloc par bloc. Retrouve ici toutes les normes de construction de la communauté BTE France.</p>
+  <div class="hero-actions">
+    <a href="norm-index.html" class="btn btn-primary">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      Consulter l'index
+    </a>
+    <a href="about.html" class="btn btn-outline">En savoir plus</a>
+  </div>
+</section>
+
+<div class="stats-bar">
+  <div class="container">
+    <div class="stat">
+      <span class="stat-value">27</span>
+      <span class="stat-label">Normes publiées</span>
+    </div>
+    <div class="stat">
+      <span class="stat-value">6</span>
+      <span class="stat-label">Catégories</span>
+    </div>
+    <div class="stat">
+      <span class="stat-value">FR</span>
+      <span class="stat-label">
+        <span class="fr-flag">
+          <span style="background:#002395"></span>
+          <span style="background:#EDEDED"></span>
+          <span style="background:#ED2939"></span>
+        </span>
+        France uniquement
+      </span>
+    </div>
+    <div class="stat">
+      <span class="stat-value">2025</span>
+      <span class="stat-label">Dernière mise à jour</span>
+    </div>
+  </div>
+</div>
+
+<div class="container section">
+  <h2 class="section-title">Toutes les catégories</h2>
+  <p class="section-subtitle">Clique sur une catégorie pour explorer les normes correspondantes.</p>
+  <div class="grid" id="category-grid"></div>
+</div>
+
+<div class="container" style="padding-bottom: 60px;">
+  <h2 class="section-title" style="margin-bottom: 8px;">Pourquoi normaliser ?</h2>
+  <p class="section-subtitle">L'objectif du projet de normalisation</p>
+  <div class="grid-2">
+    <div class="card" style="cursor: default;">
+      <div class="card-icon bleu">🎯</div>
+      <h3>Cohérence visuelle</h3>
+      <p>Quand tout le monde suit les mêmes normes, la France reconstruite dans Minecraft a une cohérence visuelle réaliste. Les routes, les bâtiments, les véhicules — tout s'harmonise.</p>
+    </div>
+    <div class="card" style="cursor: default;">
+      <div class="card-icon vert">⚡</div>
+      <h3>Construire plus vite</h3>
+      <p>Tu n'as plus besoin de réinventer la roue. Chaque norme est une recette prête à l'emploi. Copie, adapte, et construis — sans perdre de temps à chercher comment faire.</p>
+    </div>
+    <div class="card" style="cursor: default;">
+      <div class="card-icon orange">🤝</div>
+      <h3>Travail collaboratif</h3>
+      <p>Plusieurs builders sur la même ville ? Les normes permettent à chacun de contribuer sans que les styles divergent. Un résultat professionnel, même en équipe.</p>
+    </div>
+    <div class="card" style="cursor: default;">
+      <div class="card-icon violet">🇫🇷</div>
+      <h3>Spécifique à la France</h3>
+      <p>Les normes allemandes ou générales ne correspondent pas toujours à l'architecture française. Ce projet propose des standards adaptés à nos rues, nos bâtiments, notre culture.</p>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <h3>BTE France — Normalisation</h3>
+        <p>Un projet communautaire pour standardiser la construction dans Build The Earth France. Contribue sur GitHub ou rejoins notre Discord.</p>
+      </div>
+      <div class="footer-links">
+        <h4>Navigation</h4>
+        <ul>
+          <li><a href="index.html">Accueil</a></li>
+          <li><a href="norm-index.html">Index des normes</a></li>
+          <li><a href="about.html">À propos</a></li>
+        </ul>
+      </div>
+      <div class="footer-links">
+        <h4>Liens</h4>
+        <ul>
+          <li><a href="https://discord.gg/buildtheearthfrance" target="_blank">Discord</a></li>
+          <li><a href="https://github.com/" target="_blank">GitHub</a></li>
+          <li><a href="https://buildtheearth.net" target="_blank">BTE Global</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2025 BTE France Normalisation — Projet communautaire open-source</span>
+      <span>Fait avec ❤️ pour la communauté française</span>
+    </div>
+  </div>
+</footer>
+
+<script src="assets/js/main.js"></script>
+<script>
+  const grid = document.getElementById('category-grid');
+  Object.entries(NORMS_DATA).forEach(([key, cat]) => {
+    const card = document.createElement('a');
+    card.className = 'card';
+    card.href = `norm-index.html#${key}`;
+    card.innerHTML = `
+      <div class="card-icon ${cat.color}">${cat.icon}</div>
+      <div class="card-num">${key}</div>
+      <h3>${cat.title}</h3>
+      <p>${cat.description}</p>
+      <div class="card-footer">
+        <span>${cat.items.length} norme${cat.items.length > 1 ? 's' : ''}</span>
+        <span class="tag tag-bleu">Voir →</span>
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+</script>
+
+</body>
+</html>
