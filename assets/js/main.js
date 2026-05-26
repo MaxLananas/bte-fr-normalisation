@@ -14,8 +14,7 @@ const NORMS_DATA = [
     icon: 'fa-solid fa-circle-info',
     items: [
       { id: 'N1.1', title: 'À propos des Normes', file: 'N1/N1.1.md' },
-      { id: 'N1.2', title: 'Soumettre une Norme', file: 'N1/N1.2.md' },
-      { id: 'N1.3', title: 'Rejoindre le Comité', file: 'N1/N1.3.md' }
+      { id: 'N1.2', title: 'Soumettre une Norme', file: 'N1/N1.2.md' }
     ]
   },
   {
