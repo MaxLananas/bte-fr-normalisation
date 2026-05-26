@@ -69,24 +69,18 @@ const NORMS_DATA = [
   }
 ];
 
-const _base = (function () {
-  const scripts = document.querySelectorAll('script[src]');
-  for (const s of scripts) {
-    const src = s.getAttribute('src');
-    if (src && src.includes('main.js')) {
-      const u = new URL(src, window.location.href);
-      return u.href.replace(/\/assets\/js\/main\.js.*$/, '');
-    }
-  }
-  return window.location.origin + window.location.pathname.replace(/\/[^/]*$/, '');
-})();
+const GITHUB_USER = 'MaxLananas';
+const GITHUB_REPO = 'bte-fr-normalisation';
+const GITHUB_BRANCH = 'main';
+const RAW_BASE = `https://raw.githubusercontent.com/${GITHUB_USER}/${GITHUB_REPO}/${GITHUB_BRANCH}`;
+const PAGES_BASE = `https://${GITHUB_USER}.github.io/${GITHUB_REPO}`;
 
 function normUrl(file) {
-  return _base + '/norms/' + file;
+  return `${RAW_BASE}/norms/${file}`;
 }
 
 function pageUrl(page) {
-  return _base + '/' + page;
+  return `${PAGES_BASE}/${page}`;
 }
 
 function getAllItems() {
