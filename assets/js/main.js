@@ -1,12 +1,21 @@
+const GITHUB_USER   = 'MaxLananas';
+const GITHUB_REPO   = 'bte-fr-normalisation';
+const GITHUB_BRANCH = 'main';
+const RAW_BASE      = 'https://raw.githubusercontent.com/' + GITHUB_USER + '/' + GITHUB_REPO + '/' + GITHUB_BRANCH;
+const PAGES_BASE    = 'https://' + GITHUB_USER + '.github.io/' + GITHUB_REPO;
+
+function normUrl(file) { return RAW_BASE  + '/norms/' + file; }
+function pageUrl(page)  { return PAGES_BASE + '/' + page; }
+
 const NORMS_DATA = [
   {
     id: 'N1',
     title: 'À propos de la Normalisation',
     icon: 'fa-solid fa-circle-info',
     items: [
-      { id: 'N1.1', title: 'À propos des Normes',  file: 'N1/N1.1.md' },
-      { id: 'N1.2', title: 'Soumettre une Norme',  file: 'N1/N1.2.md' },
-      { id: 'N1.3', title: 'Rejoindre le Comité',  file: 'N1/N1.3.md' }
+      { id: 'N1.1', title: 'À propos des Normes', file: 'N1/N1.1.md' },
+      { id: 'N1.2', title: 'Soumettre une Norme', file: 'N1/N1.2.md' },
+      { id: 'N1.3', title: 'Rejoindre le Comité', file: 'N1/N1.3.md' }
     ]
   },
   {
@@ -14,12 +23,12 @@ const NORMS_DATA = [
     title: 'Infrastructure routière',
     icon: 'fa-solid fa-road',
     items: [
-      { id: 'N2.1', title: 'Routes',                            file: 'N2/N2.1.md' },
-      { id: 'N2.2', title: 'Trottoirs',                         file: 'N2/N2.2.md' },
-      { id: 'N2.3', title: 'Parkings & places de stationnement',file: 'N2/N2.3.md' },
-      { id: 'N2.4', title: 'Panneaux de signalisation',         file: 'N2/N2.4.md' },
-      { id: 'N2.5', title: 'Arrêts de bus',                     file: 'N2/N2.5.md' },
-      { id: 'N2.6', title: 'Pistes cyclables & arceaux vélo',   file: 'N2/N2.6.md' }
+      { id: 'N2.1', title: 'Routes',                             file: 'N2/N2.1.md' },
+      { id: 'N2.2', title: 'Trottoirs',                          file: 'N2/N2.2.md' },
+      { id: 'N2.3', title: 'Parkings & places de stationnement', file: 'N2/N2.3.md' },
+      { id: 'N2.4', title: 'Panneaux de signalisation',          file: 'N2/N2.4.md' },
+      { id: 'N2.5', title: 'Arrêts de bus',                      file: 'N2/N2.5.md' },
+      { id: 'N2.6', title: 'Pistes cyclables & arceaux vélo',    file: 'N2/N2.6.md' }
     ]
   },
   {
@@ -50,11 +59,11 @@ const NORMS_DATA = [
     title: 'Mobilier urbain',
     icon: 'fa-solid fa-city',
     items: [
-      { id: 'N5.1', title: 'Éclairage public',       file: 'N5/N5.1.md' },
-      { id: 'N5.2', title: 'Arbres & végétation',    file: 'N5/N5.2.md' },
-      { id: 'N5.3', title: 'Bancs & mobilier de rue',file: 'N5/N5.3.md' },
-      { id: 'N5.4', title: 'Poubelles & conteneurs', file: 'N5/N5.4.md' },
-      { id: 'N5.5', title: 'Poteaux électriques',    file: 'N5/N5.5.md' }
+      { id: 'N5.1', title: 'Éclairage public',        file: 'N5/N5.1.md' },
+      { id: 'N5.2', title: 'Arbres & végétation',     file: 'N5/N5.2.md' },
+      { id: 'N5.3', title: 'Bancs & mobilier de rue', file: 'N5/N5.3.md' },
+      { id: 'N5.4', title: 'Poubelles & conteneurs',  file: 'N5/N5.4.md' },
+      { id: 'N5.5', title: 'Poteaux électriques',     file: 'N5/N5.5.md' }
     ]
   },
   {
@@ -62,21 +71,12 @@ const NORMS_DATA = [
     title: 'Drapeaux, Logos & Enseignes',
     icon: 'fa-solid fa-flag',
     items: [
-      { id: 'N6.1', title: 'Drapeaux de France & régions',    file: 'N6/N6.1.md' },
-      { id: 'N6.2', title: "Logos d'entreprises françaises",  file: 'N6/N6.2.md' },
-      { id: 'N6.3', title: 'Enseignes commerciales',          file: 'N6/N6.3.md' }
+      { id: 'N6.1', title: 'Drapeaux de France & régions',   file: 'N6/N6.1.md' },
+      { id: 'N6.2', title: "Logos d'entreprises françaises", file: 'N6/N6.2.md' },
+      { id: 'N6.3', title: 'Enseignes commerciales',         file: 'N6/N6.3.md' }
     ]
   }
 ];
-
-const GITHUB_USER   = 'MaxLananas';
-const GITHUB_REPO   = 'bte-fr-normalisation';
-const GITHUB_BRANCH = 'main';
-const RAW_BASE      = 'https://raw.githubusercontent.com/' + GITHUB_USER + '/' + GITHUB_REPO + '/' + GITHUB_BRANCH;
-const PAGES_BASE    = 'https://' + GITHUB_USER + '.github.io/' + GITHUB_REPO;
-
-function normUrl(file) { return RAW_BASE  + '/norms/' + file; }
-function pageUrl(page)  { return PAGES_BASE + '/' + page; }
 
 function getAllItems() {
   return NORMS_DATA.flatMap(function (cat) { return cat.items; });
@@ -86,7 +86,7 @@ function getNeighbours(file) {
   const all = getAllItems();
   const idx = all.findIndex(function (i) { return i.file === file; });
   return {
-    prev: idx > 0                ? all[idx - 1] : null,
+    prev: idx > 0               ? all[idx - 1] : null,
     next: idx < all.length - 1  ? all[idx + 1] : null
   };
 }
