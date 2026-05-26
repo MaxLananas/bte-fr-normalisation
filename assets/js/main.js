@@ -1,92 +1,118 @@
-const NORMS_DATA = {
-  N1: {
-    title: "À propos de la Normalisation",
-    icon: "📋",
-    color: "bleu",
-    description: "Comprendre le système de normes, comment les soumettre et rejoindre le comité.",
+const BASE_URL = (() => {
+  const p = window.location.pathname;
+  const repo = p.split('/')[1];
+  if (window.location.hostname.includes('github.io') && repo) {
+    return '/' + repo;
+  }
+  return '';
+})();
+
+function url(path) {
+  return BASE_URL + '/' + path.replace(/^\//, '');
+}
+
+const NORMS_DATA = [
+  {
+    id: 'N1',
+    title: 'À propos de la Normalisation',
+    icon: 'fa-solid fa-circle-info',
     items: [
-      { id: "N1.1", title: "À propos des Normes", file: "N1/N1.1.md" },
-      { id: "N1.2", title: "Soumettre une Norme", file: "N1/N1.2.md" },
-      { id: "N1.3", title: "Rejoindre le Comité", file: "N1/N1.3.md" }
+      { id: 'N1.1', title: 'À propos des Normes', file: 'N1/N1.1.md' },
+      { id: 'N1.2', title: 'Soumettre une Norme', file: 'N1/N1.2.md' },
+      { id: 'N1.3', title: 'Rejoindre le Comité', file: 'N1/N1.3.md' }
     ]
   },
-  N2: {
-    title: "Infrastructure",
-    icon: "🏗️",
-    color: "rouge",
-    description: "Routes, trottoirs, voies ferrées, signalisation et tout ce qui structure l'espace urbain.",
+  {
+    id: 'N2',
+    title: 'Infrastructure routière',
+    icon: 'fa-solid fa-road',
     items: [
-      { id: "N2.1", title: "Routes", file: "N2/N2.1.md" },
-      { id: "N2.2", title: "Trottoirs", file: "N2/N2.2.md" },
-      { id: "N2.3", title: "Voies ferrées", file: "N2/N2.3.md" },
-      { id: "N2.4", title: "Signalisation routière", file: "N2/N2.4.md" },
-      { id: "N2.5", title: "Éclairage public", file: "N2/N2.5.md" }
+      { id: 'N2.1', title: 'Routes', file: 'N2/N2.1.md' },
+      { id: 'N2.2', title: 'Trottoirs', file: 'N2/N2.2.md' },
+      { id: 'N2.3', title: 'Parkings & places de stationnement', file: 'N2/N2.3.md' },
+      { id: 'N2.4', title: 'Panneaux de signalisation', file: 'N2/N2.4.md' },
+      { id: 'N2.5', title: 'Arrêts de bus', file: 'N2/N2.5.md' },
+      { id: 'N2.6', title: 'Pistes cyclables & arceaux vélo', file: 'N2/N2.6.md' }
     ]
   },
-  N3: {
-    title: "Bâtiments",
-    icon: "🏢",
-    color: "vert",
-    description: "Portes, fenêtres, toits, murs et tous les éléments constitutifs d'un bâtiment.",
+  {
+    id: 'N3',
+    title: 'Transports en commun & Voies ferrées',
+    icon: 'fa-solid fa-train',
     items: [
-      { id: "N3.1", title: "Portes", file: "N3/N3.1.md" },
-      { id: "N3.2", title: "Fenêtres", file: "N3/N3.2.md" },
-      { id: "N3.3", title: "Toits", file: "N3/N3.3.md" },
-      { id: "N3.4", title: "Murs et façades", file: "N3/N3.4.md" },
-      { id: "N3.5", title: "Balcons et terrasses", file: "N3/N3.5.md" }
+      { id: 'N3.1', title: 'Rails de train', file: 'N3/N3.1.md' },
+      { id: 'N3.2', title: 'Rails de tramway', file: 'N3/N3.2.md' },
+      { id: 'N3.3', title: 'Caténaires', file: 'N3/N3.3.md' }
     ]
   },
-  N4: {
-    title: "Véhicules",
-    icon: "🚗",
-    color: "orange",
-    description: "Voitures, camions, bus, trains, avions et embarcations fluviales.",
+  {
+    id: 'N4',
+    title: 'Bâtiments',
+    icon: 'fa-solid fa-building',
     items: [
-      { id: "N4.1", title: "Voitures", file: "N4/N4.1.md" },
-      { id: "N4.2", title: "Camions et utilitaires", file: "N4/N4.2.md" },
-      { id: "N4.3", title: "Bus et transports en commun", file: "N4/N4.3.md" },
-      { id: "N4.4", title: "Trains", file: "N4/N4.4.md" }
+      { id: 'N4.1', title: 'Hauteur des bâtiments', file: 'N4/N4.1.md' },
+      { id: 'N4.2', title: 'Fenêtres', file: 'N4/N4.2.md' },
+      { id: 'N4.3', title: 'Toits', file: 'N4/N4.3.md' },
+      { id: 'N4.4', title: 'Portes', file: 'N4/N4.4.md' },
+      { id: 'N4.5', title: 'Murs & façades', file: 'N4/N4.5.md' },
+      { id: 'N4.6', title: 'Balcons & terrasses', file: 'N4/N4.6.md' }
     ]
   },
-  N5: {
-    title: "Décorations & Mobilier",
-    icon: "🪑",
-    color: "violet",
-    description: "Bancs, poubelles, lampadaires, fontaines et tout le mobilier urbain.",
+  {
+    id: 'N5',
+    title: 'Mobilier urbain',
+    icon: 'fa-solid fa-city',
     items: [
-      { id: "N5.1", title: "Mobilier urbain", file: "N5/N5.1.md" },
-      { id: "N5.2", title: "Parcs et espaces verts", file: "N5/N5.2.md" },
-      { id: "N5.3", title: "Décorations intérieures", file: "N5/N5.3.md" }
+      { id: 'N5.1', title: 'Éclairage public', file: 'N5/N5.1.md' },
+      { id: 'N5.2', title: 'Arbres & végétation', file: 'N5/N5.2.md' },
+      { id: 'N5.3', title: 'Bancs & mobilier de rue', file: 'N5/N5.3.md' },
+      { id: 'N5.4', title: 'Poubelles & conteneurs', file: 'N5/N5.4.md' },
+      { id: 'N5.5', title: 'Poteaux électriques', file: 'N5/N5.5.md' }
     ]
   },
-  N6: {
-    title: "Logos, Drapeaux & Enseignes",
-    icon: "🏳️",
-    color: "jaune",
-    description: "Drapeaux français et régionaux, logos d'entreprises, panneaux et enseignes.",
+  {
+    id: 'N6',
+    title: 'Drapeaux, Logos & Enseignes',
+    icon: 'fa-solid fa-flag',
     items: [
-      { id: "N6.1", title: "Drapeaux de France et régions", file: "N6/N6.1.md" },
-      { id: "N6.2", title: "Logos d'entreprises", file: "N6/N6.2.md" },
-      { id: "N6.3", title: "Enseignes commerciales", file: "N6/N6.3.md" }
+      { id: 'N6.1', title: 'Drapeaux de France & régions', file: 'N6/N6.1.md' },
+      { id: 'N6.2', title: 'Logos d\'entreprises françaises', file: 'N6/N6.2.md' },
+      { id: 'N6.3', title: 'Enseignes commerciales', file: 'N6/N6.3.md' }
     ]
   }
-};
+];
 
-function setActive() {
-  const currentPage = window.location.pathname.split('/').pop() || 'index.html';
-  document.querySelectorAll('.nav-links a').forEach(link => {
-    link.classList.remove('active');
-    const href = link.getAttribute('href');
-    if (href === currentPage || (currentPage === '' && href === 'index.html')) {
-      link.classList.add('active');
+function getAllItems() {
+  return NORMS_DATA.flatMap(cat => cat.items);
+}
+
+function findItem(file) {
+  return getAllItems().find(i => i.file === file) || null;
+}
+
+function getNeighbours(file) {
+  const all = getAllItems();
+  const idx = all.findIndex(i => i.file === file);
+  return {
+    prev: idx > 0 ? all[idx - 1] : null,
+    next: idx < all.length - 1 ? all[idx + 1] : null
+  };
+}
+
+function setActiveNav() {
+  const page = window.location.pathname.split('/').pop() || 'index.html';
+  document.querySelectorAll('.nav-links a').forEach(a => {
+    a.classList.remove('active');
+    const h = a.getAttribute('href') || '';
+    if (h.includes(page) || (page === '' && h.includes('index.html'))) {
+      a.classList.add('active');
     }
   });
 }
 
-function formatDate(dateStr) {
-  return new Date(dateStr).toLocaleDateString('fr-FR', {
-    year: 'numeric', month: 'long', day: 'numeric'
-  });
+function fmtDate(d) {
+  if (!d) return '';
+  return new Date(d).toLocaleDateString('fr-FR', { year: 'numeric', month: 'long', day: 'numeric' });
 }
 
-document.addEventListener('DOMContentLoaded', setActive);
+document.addEventListener('DOMContentLoaded', setActiveNav);
