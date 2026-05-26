@@ -131,7 +131,6 @@
     </div>
   </div>
 </footer>
-
 <script src="assets/js/main.js"></script>
 <script>
   (function () {
@@ -141,14 +140,22 @@
     NORMS_DATA.forEach(cat => {
       total += cat.items.length;
       const card = document.createElement('a');
-      card.href = url('norm-index.html') + '#' + cat.id;
+      card.href = pageUrl('norm-index.html') + '#' + cat.id;
       card.style.cssText = `
         display:block;background:#fff;border:1px solid var(--bordure);border-radius:var(--radius);
         padding:20px 22px;text-decoration:none;color:inherit;
         transition:box-shadow 0.15s,border-color 0.15s,transform 0.15s;
       `;
-      card.onmouseenter = () => { card.style.boxShadow = 'var(--ombre-md)'; card.style.borderColor = '#2563a8'; card.style.transform = 'translateY(-1px)'; };
-      card.onmouseleave = () => { card.style.boxShadow = ''; card.style.borderColor = 'var(--bordure)'; card.style.transform = ''; };
+      card.onmouseenter = () => {
+        card.style.boxShadow = 'var(--ombre-md)';
+        card.style.borderColor = '#2563a8';
+        card.style.transform = 'translateY(-1px)';
+      };
+      card.onmouseleave = () => {
+        card.style.boxShadow = '';
+        card.style.borderColor = 'var(--bordure)';
+        card.style.transform = '';
+      };
 
       card.innerHTML = `
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
