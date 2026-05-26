@@ -63,25 +63,30 @@ const NORMS_DATA = [
     icon: 'fa-solid fa-flag',
     items: [
       { id: 'N6.1', title: 'Drapeaux de France & régions', file: 'N6/N6.1.md' },
-      { id: 'N6.2', title: 'Logos d\'entreprises françaises', file: 'N6/N6.2.md' },
+      { id: 'N6.2', title: "Logos d'entreprises françaises", file: 'N6/N6.2.md' },
       { id: 'N6.3', title: 'Enseignes commerciales', file: 'N6/N6.3.md' }
     ]
   }
 ];
 
-function resolveBase() {
-  const loc = window.location;
-  const parts = loc.pathname.split('/');
-  parts.pop();
-  return loc.origin + parts.join('/');
-}
+const _base = (function () {
+  const scripts = document.querySelectorAll('script[src]');
+  for (const s of scripts) {
+    const src = s.getAttribute('src');
+    if (src && src.includes('main.js')) {
+      const u = new URL(src, window.location.href);
+      return u.href.replace(/\/assets\/js\/main\.js.*$/, '');
+    }
+  }
+  return window.location.origin + window.location.pathname.replace(/\/[^/]*$/, '');
+})();
 
 function normUrl(file) {
-  return resolveBase() + '/norms/' + file;
+  return _base + '/norms/' + file;
 }
 
 function pageUrl(page) {
-  return resolveBase() + '/' + page;
+  return _base + '/' + page;
 }
 
 function getAllItems() {
@@ -101,10 +106,8 @@ function setActiveNav() {
   const page = window.location.pathname.split('/').pop() || 'index.html';
   document.querySelectorAll('.nav-links a').forEach(a => {
     a.classList.remove('active');
-    const h = a.getAttribute('href') || '';
-    if (h === page || (page === '' && h === 'index.html')) {
-      a.classList.add('active');
-    }
+    const h = (a.getAttribute('href') || '').split('/').pop();
+    if (h === page) a.classList.add('active');
   });
 }
 
