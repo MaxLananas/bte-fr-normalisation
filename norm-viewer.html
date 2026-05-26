@@ -6,6 +6,16 @@
   <title>Norme — BTE France</title>
   <link rel="stylesheet" href="assets/css/style.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <script>
+    const GITHUB_USER   = 'MaxLananas';
+    const GITHUB_REPO   = 'bte-fr-normalisation';
+    const GITHUB_BRANCH = 'main';
+    const RAW_BASE      = 'https://raw.githubusercontent.com/' + GITHUB_USER + '/' + GITHUB_REPO + '/' + GITHUB_BRANCH;
+    const PAGES_BASE    = 'https://' + GITHUB_USER + '.github.io/' + GITHUB_REPO;
+
+    function normUrl(file) { return RAW_BASE + '/norms/' + file; }
+    function pageUrl(page)  { return PAGES_BASE + '/' + page; }
+  </script>
 </head>
 <body>
 
@@ -32,14 +42,12 @@
 
 <div class="container page-body">
   <div class="wiki-layout">
-
     <aside class="wiki-sidebar">
       <div class="sidebar-head"><i class="fa-solid fa-list"></i> Table des matières</div>
       <ul class="sidebar-list" id="toc">
         <li><span class="sidebar-section-label">Chargement...</span></li>
       </ul>
     </aside>
-
     <main class="wiki-main">
       <div class="wiki-article">
         <div class="article-header" id="norm-header">
@@ -50,10 +58,8 @@
         </div>
         <div class="article-body" id="norm-body"></div>
       </div>
-
       <div class="article-nav" id="article-nav"></div>
     </main>
-
   </div>
 </div>
 
@@ -97,9 +103,207 @@
 </footer>
 
 <script src="assets/js/main.js"></script>
-<script src="assets/js/md-renderer.js"></script>
 <script>
-  loadNormPage();
+(function () {
+  const MARKED_SRC = 'https://cdn.jsdelivr.net/npm/marked@12/marked.min.js';
+
+  function loadScript(src) {
+    return new Promise((res, rej) => {
+      if (document.querySelector('script[src="' + src + '"]')) { res(); return; }
+      const s = document.createElement('script');
+      s.src = src;
+      s.onload = res;
+      s.onerror = rej;
+      document.head.appendChild(s);
+    });
+  }
+
+  function parseFrontmatter(raw) {
+    const fm = {};
+    let body = raw;
+    if (raw.trimStart().startsWith('---')) {
+      const start = raw.indexOf('---');
+      const end   = raw.indexOf('---', start + 3);
+      if (end !== -1) {
+        raw.slice(start + 3, end).trim().split('\n').forEach(line => {
+          const colon = line.indexOf(':');
+          if (colon === -1) return;
+          const k = line.slice(0, colon).trim();
+          const v = line.slice(colon + 1).trim().replace(/^['"]|['"]$/g, '');
+          if (k) fm[k] = v;
+        });
+        body = raw.slice(end + 3).trim();
+      }
+    }
+    return { fm, body };
+  }
+
+  function applyCallouts(html) {
+    return html.replace(
+      /<blockquote>\s*<p>\[!(INFO|WARNING|TIP|DANGER)\]([^<]*)<\/p>([\s\S]*?)<\/blockquote>/gi,
+      function (_, type, title, rest) {
+        const map = {
+          INFO:    { cls: 'info',    icon: 'fa-solid fa-circle-info' },
+          WARNING: { cls: 'warning', icon: 'fa-solid fa-triangle-exclamation' },
+          TIP:     { cls: 'tip',     icon: 'fa-solid fa-lightbulb' },
+          DANGER:  { cls: 'danger',  icon: 'fa-solid fa-circle-xmark' }
+        };
+        const t = map[type.toUpperCase()] || map.INFO;
+        const inner = rest.replace(/<\/?p>/g, '').trim();
+        return '<div class="callout ' + t.cls + '">'
+          + '<i class="callout-ico ' + t.icon + '"></i>'
+          + '<div class="callout-content">'
+          + (title.trim() ? '<strong>' + title.trim() + '</strong>' : '')
+          + (inner ? '<p style="margin:4px 0 0">' + inner + '</p>' : '')
+          + '</div></div>';
+      }
+    );
+  }
+
+  function applyGallery(html) {
+    return html.replace(/<!--gallery-->([\s\S]*?)<!--\/gallery-->/gi, function (_, c) {
+      return '<div class="img-grid">' + c + '</div>';
+    });
+  }
+
+  function buildHeader(fm, file) {
+    const headerEl = document.getElementById('norm-header');
+    if (!headerEl) return;
+    const statusMap = { 'Validée': 'badge-green', 'En cours': 'badge-orange', 'Dépréciée': 'badge-red' };
+    const badgeCls  = statusMap[fm.status] || 'badge-grey';
+    headerEl.innerHTML =
+      '<div class="article-breadcrumb">'
+      + '<a href="' + pageUrl('index.html') + '">Accueil</a>'
+      + '<i class="fa-solid fa-chevron-right"></i>'
+      + '<a href="' + pageUrl('norm-index.html') + '">Index</a>'
+      + '<i class="fa-solid fa-chevron-right"></i>'
+      + '<span>' + (fm.id || file.replace('.md', '')) + '</span>'
+      + '</div>'
+      + '<div class="article-id">' + (fm.id || '') + '</div>'
+      + '<h1>' + (fm.title || 'Norme') + '</h1>'
+      + '<div class="article-meta">'
+      + (fm.status   ? '<span><span class="badge ' + badgeCls + '"><i class="fa-solid fa-circle-dot"></i> ' + fm.status + '</span></span>' : '')
+      + (fm.authors  ? '<span><i class="fa-solid fa-user-pen"></i> ' + fm.authors + '</span>' : '')
+      + (fm.date     ? '<span><i class="fa-regular fa-calendar"></i> ' + fmtDate(fm.date) + '</span>' : '')
+      + (fm.category ? '<span><i class="fa-solid fa-folder"></i> ' + fm.category + '</span>' : '')
+      + '</div>';
+  }
+
+  function buildTOC(bodyEl) {
+    const tocEl = document.getElementById('toc');
+    if (!tocEl || !bodyEl) return;
+    const headings = bodyEl.querySelectorAll('h2, h3');
+    if (!headings.length) {
+      tocEl.innerHTML = '<li><span class="sidebar-section-label">Aucune section</span></li>';
+      return;
+    }
+    tocEl.innerHTML = '';
+    headings.forEach(function (h, i) {
+      const id = 'section-' + i;
+      h.id = id;
+      const li = document.createElement('li');
+      const a  = document.createElement('a');
+      a.href = '#' + id;
+      a.textContent = h.textContent;
+      if (h.tagName === 'H3') a.classList.add('sub');
+      li.appendChild(a);
+      tocEl.appendChild(li);
+    });
+    const links = tocEl.querySelectorAll('a');
+    const obs = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting) {
+          links.forEach(function (l) { l.classList.remove('active'); });
+          const al = tocEl.querySelector('a[href="#' + e.target.id + '"]');
+          if (al) al.classList.add('active');
+        }
+      });
+    }, { rootMargin: '-10% 0px -80% 0px' });
+    headings.forEach(function (h) { obs.observe(h); });
+  }
+
+  function buildAuthors(fm, bodyEl) {
+    if (!fm.authors || !bodyEl) return;
+    const authors = fm.authors.split(',').map(function (a) { return a.trim(); }).filter(Boolean);
+    const block   = document.createElement('div');
+    block.className = 'authors-block';
+    block.innerHTML = '<h4>Auteurs</h4><div class="author-chips">'
+      + authors.map(function (a) {
+          return '<div class="author-chip"><div class="ava">' + a.charAt(0).toUpperCase() + '</div>' + a + '</div>';
+        }).join('')
+      + '</div>';
+    bodyEl.appendChild(block);
+  }
+
+  function buildArticleNav(file) {
+    const navEl = document.getElementById('article-nav');
+    if (!navEl) return;
+    const nb   = getNeighbours(file);
+    const prev = nb.prev;
+    const next = nb.next;
+    navEl.innerHTML =
+      (prev
+        ? '<a href="' + pageUrl('norm-viewer.html') + '?norm=' + prev.file + '" class="art-nav-btn prev">'
+          + '<i class="fa-solid fa-arrow-left"></i>'
+          + '<div><small>Précédent</small><strong>' + prev.id + ' — ' + prev.title + '</strong></div>'
+          + '</a>'
+        : '<div></div>')
+      + (next
+        ? '<a href="' + pageUrl('norm-viewer.html') + '?norm=' + next.file + '" class="art-nav-btn next">'
+          + '<div><small>Suivant</small><strong>' + next.id + ' — ' + next.title + '</strong></div>'
+          + '<i class="fa-solid fa-arrow-right"></i>'
+          + '</a>'
+        : '<div></div>');
+  }
+
+  async function run() {
+    const params   = new URLSearchParams(window.location.search);
+    const normFile = params.get('norm');
+    const headerEl = document.getElementById('norm-header');
+    const bodyEl   = document.getElementById('norm-body');
+
+    if (!normFile) { window.location.href = pageUrl('index.html'); return; }
+
+    const target = normUrl(normFile);
+
+    console.log('Fetching:', target);
+
+    try {
+      const resp = await fetch(target);
+      if (!resp.ok) throw new Error('HTTP ' + resp.status);
+      const raw        = await resp.text();
+      const { fm, body } = parseFrontmatter(raw);
+
+      buildHeader(fm, normFile);
+
+      await loadScript(MARKED_SRC);
+      marked.setOptions({ breaks: true, gfm: true });
+      let html = marked.parse(body);
+      html = applyCallouts(html);
+      html = applyGallery(html);
+      bodyEl.innerHTML = html;
+
+      buildAuthors(fm, bodyEl);
+      buildTOC(bodyEl);
+      buildArticleNav(normFile);
+
+      if (fm.title) document.title = fm.id + ' — ' + fm.title + ' · BTE France Normes';
+
+    } catch (err) {
+      if (headerEl) headerEl.innerHTML = '';
+      bodyEl.innerHTML =
+        '<div class="error-state">'
+        + '<i class="fa-solid fa-file-circle-xmark"></i>'
+        + '<h3>Norme introuvable</h3>'
+        + '<p>Impossible de charger <code>norms/' + normFile + '</code>.</p>'
+        + '<p>URL tentée : <code>' + target + '</code></p>'
+        + '<p style="margin-top:16px"><a href="' + pageUrl('norm-index.html') + '"><i class="fa-solid fa-arrow-left"></i> Retour à l\'index</a></p>'
+        + '</div>';
+    }
+  }
+
+  run();
+})();
 </script>
 
 </body>
