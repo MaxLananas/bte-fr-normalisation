@@ -131,26 +131,30 @@
   }
 
   function applyCallouts(html) {
-    return html.replace(
-      /<blockquote>\s*<p>\[!(INFO|WARNING|TIP|DANGER)\]([^<]*)<\/p>([\s\S]*?)<\/blockquote>/gi,
-      function (_, type, title, rest) {
-        var map = {
-          INFO:    { cls: 'info',    icon: 'fa-solid fa-circle-info' },
-          WARNING: { cls: 'warning', icon: 'fa-solid fa-triangle-exclamation' },
-          TIP:     { cls: 'tip',     icon: 'fa-solid fa-lightbulb' },
-          DANGER:  { cls: 'danger',  icon: 'fa-solid fa-circle-xmark' }
-        };
-        var t = map[type.toUpperCase()] || map.INFO;
-        var inner = rest.replace(/<\/?p>/g, '').trim();
-        return '<div class="callout ' + t.cls + '">'
-          + '<i class="callout-ico ' + t.icon + '"></i>'
-          + '<div class="callout-content">'
-          + (title.trim() ? '<strong>' + title.trim() + '</strong>' : '')
-          + (inner ? '<p style="margin:4px 0 0">' + inner + '</p>' : '')
-          + '</div></div>';
-      }
-    );
-  }
+   return html.replace(
+    /<blockquote>\s*<p>\[!(INFO|WARNING|TIP|DANGER)\](.*?)<\/p>([\s\S]*?)<\/blockquote>/gi,
+    function (_, type, title, rest) {
+      var map = {
+        INFO:    { cls: 'info',    icon: 'fa-solid fa-circle-info' },
+        WARNING: { cls: 'warning', icon: 'fa-solid fa-triangle-exclamation' },
+        TIP:     { cls: 'tip',     icon: 'fa-solid fa-lightbulb' },
+        DANGER:  { cls: 'danger',  icon: 'fa-solid fa-circle-xmark' }
+      };
+      var t     = map[type.toUpperCase()] || map.INFO;
+      var inner = rest
+        .replace(/<blockquote>/gi, '')
+        .replace(/<\/blockquote>/gi, '')
+        .replace(/^\s*<p>|<\/p>\s*$/g, '')
+        .trim();
+      return '<div class="callout ' + t.cls + '">'
+        + '<i class="callout-ico ' + t.icon + '"></i>'
+        + '<div class="callout-content">'
+        + (title.trim() ? '<strong>' + title.trim() + '</strong>' : '')
+        + (inner ? '<p style="margin:4px 0 0">' + inner + '</p>' : '')
+        + '</div></div>';
+    }
+  );
+}
 
   function applyGallery(html) {
     return html.replace(/<!--gallery-->([\s\S]*?)<!--\/gallery-->/gi, function (_, c) {
