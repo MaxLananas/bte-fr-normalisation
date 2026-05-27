@@ -30,20 +30,18 @@
   </div>
 </nav>
 
-<section class="hero" style="padding:44px 24px 40px;">
+<section class="hero" style="padding:56px 28px 52px;">
   <div class="hero-eyebrow"><i class="fa-solid fa-list"></i> Index complet</div>
-  <h1>Index des <em>Normes</em></h1>
-  <p class="hero-desc">Toutes les normes de construction BTE France, classées par catégorie.</p>
+  <h1>Toutes les <em>normes</em></h1>
+  <p class="hero-desc">Retrouve toutes les normes de construction BTE France classées par catégorie.</p>
 </section>
 
 <div class="container page-body">
   <div class="index-page-layout">
-
     <aside class="index-toc">
       <div class="index-toc-head"><i class="fa-solid fa-layer-group"></i> Catégories</div>
       <ul class="index-toc-list" id="cat-toc"></ul>
     </aside>
-
     <div class="index-main">
       <div class="index-search">
         <i class="fa-solid fa-magnifying-glass"></i>
@@ -51,7 +49,6 @@
       </div>
       <div id="index-body"></div>
     </div>
-
   </div>
 </div>
 
@@ -93,17 +90,17 @@
     </div>
   </div>
 </footer>
+
 <script src="assets/js/main.js"></script>
 <script>
-  var colors    = ['c0','c1','c2','c3','c4','c5'];
-  var chipColor = {
-    c0: 'rgba(167,139,250,0.2);color:#a78bfa',
-    c1: 'rgba(245,230,66,0.2);color:#f5e642',
-    c2: 'rgba(74,222,128,0.2);color:#4ade80',
-    c3: 'rgba(244,114,182,0.2);color:#f472b6',
-    c4: 'rgba(251,146,60,0.2);color:#fb923c',
-    c5: 'rgba(34,211,238,0.2);color:#22d3ee'
-  };
+  var chipStyles = [
+    'background:rgba(124,58,237,0.1);color:#7C3AED',
+    'background:rgba(22,163,74,0.1);color:#16A34A',
+    'background:rgba(217,119,6,0.1);color:#D97706',
+    'background:rgba(2,132,199,0.1);color:#0284C7',
+    'background:rgba(219,39,119,0.1);color:#DB2777',
+    'background:rgba(234,88,12,0.1);color:#EA580C'
+  ];
 
   var toc  = document.getElementById('cat-toc');
   var body = document.getElementById('index-body');
@@ -118,14 +115,13 @@
       });
       if (lf && !visible.length) return;
 
-      var c    = colors[idx % colors.length];
       var list = lf ? visible : cat.items;
       var sec  = document.createElement('div');
       sec.className = 'index-section';
       sec.id = cat.id;
       sec.innerHTML =
         '<div class="index-section-head">'
-        + '<span class="index-section-num" style="background:' + chipColor[c] + '">' + cat.id + '</span>'
+        + '<span class="index-section-num" style="' + chipStyles[idx % chipStyles.length] + '">' + cat.id + '</span>'
         + '<h3>' + cat.title + '</h3>'
         + '<i class="' + cat.icon + '"></i>'
         + '</div>'
@@ -162,7 +158,9 @@
 
   render();
 
-  document.getElementById('search').addEventListener('input', function (e) { render(e.target.value); });
+  document.getElementById('search').addEventListener('input', function (e) {
+    render(e.target.value);
+  });
 
   if (window.location.hash) {
     setTimeout(function () {
