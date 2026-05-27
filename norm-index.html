@@ -93,65 +93,68 @@
     </div>
   </div>
 </footer>
-
 <script src="assets/js/main.js"></script>
 <script>
-  const toc  = document.getElementById('cat-toc');
-  const body = document.getElementById('index-body');
+  var colors    = ['c0','c1','c2','c3','c4','c5'];
+  var chipColor = {
+    c0: 'rgba(167,139,250,0.2);color:#a78bfa',
+    c1: 'rgba(245,230,66,0.2);color:#f5e642',
+    c2: 'rgba(74,222,128,0.2);color:#4ade80',
+    c3: 'rgba(244,114,182,0.2);color:#f472b6',
+    c4: 'rgba(251,146,60,0.2);color:#fb923c',
+    c5: 'rgba(34,211,238,0.2);color:#22d3ee'
+  };
+
+  var toc  = document.getElementById('cat-toc');
+  var body = document.getElementById('index-body');
 
   function render(filter) {
-    const lf = (filter || '').toLowerCase().trim();
+    var lf = (filter || '').toLowerCase().trim();
     body.innerHTML = '';
 
-    NORMS_DATA.forEach(cat => {
-      const visible = cat.items.filter(i =>
-        !lf || i.title.toLowerCase().includes(lf) || i.id.toLowerCase().includes(lf)
-      );
+    NORMS_DATA.forEach(function (cat, idx) {
+      var visible = cat.items.filter(function (i) {
+        return !lf || i.title.toLowerCase().includes(lf) || i.id.toLowerCase().includes(lf);
+      });
       if (lf && !visible.length) return;
 
-      const list = lf ? visible : cat.items;
-      const sec  = document.createElement('div');
+      var c    = colors[idx % colors.length];
+      var list = lf ? visible : cat.items;
+      var sec  = document.createElement('div');
       sec.className = 'index-section';
       sec.id = cat.id;
-      sec.innerHTML = `
-        <div class="index-section-head">
-          <span class="index-section-num">${cat.id}</span>
-          <h3>${cat.title}</h3>
-          <i class="${cat.icon}"></i>
-        </div>
-        <ul class="index-list">
-          ${list.map(i => `
-            <li>
-              <a href="${pageUrl('norm-viewer.html')}?norm=${i.file}">
-                <span class="norm-num">${i.id}</span>
-                <span>${i.title}</span>
-                <i class="fa-solid fa-chevron-right norm-arrow"></i>
-              </a>
-            </li>
-          `).join('')}
-        </ul>
-      `;
+      sec.innerHTML =
+        '<div class="index-section-head">'
+        + '<span class="index-section-num" style="background:' + chipColor[c] + '">' + cat.id + '</span>'
+        + '<h3>' + cat.title + '</h3>'
+        + '<i class="' + cat.icon + '"></i>'
+        + '</div>'
+        + '<ul class="index-list">'
+        + list.map(function (i) {
+            return '<li><a href="' + pageUrl('norm-viewer.html') + '?norm=' + i.file + '">'
+              + '<span class="norm-num">' + i.id + '</span>'
+              + '<span>' + i.title + '</span>'
+              + '<i class="fa-solid fa-chevron-right norm-arrow"></i>'
+              + '</a></li>';
+          }).join('')
+        + '</ul>';
       body.appendChild(sec);
     });
 
     if (!body.children.length) {
-      body.innerHTML = `
-        <div class="loading-state">
-          <i class="fa-solid fa-magnifying-glass" style="font-size:1.5rem;color:var(--gris-moyen);display:block;margin-bottom:12px;"></i>
-          <p>Aucun résultat pour "<strong>${filter}</strong>"</p>
-        </div>
-      `;
+      body.innerHTML = '<div class="loading-state"><p>Aucun résultat pour <strong>' + filter + '</strong></p></div>';
     }
   }
 
-  NORMS_DATA.forEach(cat => {
-    const li = document.createElement('li');
-    const a  = document.createElement('a');
+  NORMS_DATA.forEach(function (cat, idx) {
+    var li = document.createElement('li');
+    var a  = document.createElement('a');
     a.href = '#' + cat.id;
-    a.innerHTML = `<i class="${cat.icon}"></i> ${cat.id} — ${cat.title}`;
-    a.addEventListener('click', e => {
+    a.innerHTML = '<i class="' + cat.icon + '"></i> ' + cat.id + ' — ' + cat.title;
+    a.addEventListener('click', function (e) {
       e.preventDefault();
-      document.getElementById(cat.id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      var el = document.getElementById(cat.id);
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
     });
     li.appendChild(a);
     toc.appendChild(li);
@@ -159,11 +162,12 @@
 
   render();
 
-  document.getElementById('search').addEventListener('input', e => render(e.target.value));
+  document.getElementById('search').addEventListener('input', function (e) { render(e.target.value); });
 
   if (window.location.hash) {
-    setTimeout(() => {
-      document.querySelector(window.location.hash)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    setTimeout(function () {
+      var el = document.querySelector(window.location.hash);
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }, 80);
   }
 </script>
