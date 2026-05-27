@@ -34,24 +34,25 @@
 </nav>
 
 <section class="hero">
+  <div class="hero-bg"></div>
   <div class="hero-eyebrow">
     <i class="fa-solid fa-circle"></i>
     Build The Earth France
   </div>
-  <h1>Projet de <em>Normalisation</em></h1>
-  <p class="hero-desc">Des standards partagés pour construire la France bloc par bloc. Retrouve ici toutes les normes de construction de la communauté BTE France.</p>
+  <h1>Construire la France,<br><em>un standard à la fois</em></h1>
+  <p class="hero-desc">Des normes partagées pour que chaque route, bâtiment et arbre soit cohérent sur tout le territoire.</p>
   <div class="hero-actions">
-    <a href="norm-index.html" class="btn btn-white">
+    <a href="norm-index.html" class="btn btn-jaune">
       <i class="fa-solid fa-book-open"></i>
-      Consulter l'index
+      Voir les normes
+    </a>
+    <a href="https://discord.gg/zdsG6MN99h" target="_blank" class="btn btn-discord">
+      <i class="fa-brands fa-discord"></i>
+      Discord
     </a>
     <a href="about.html" class="btn btn-ghost">
       <i class="fa-solid fa-circle-info"></i>
-      En savoir plus
-    </a>
-    <a href="https://discord.gg/zdsG6MN99h" target="_blank" class="btn btn-ghost">
-      <i class="fa-brands fa-discord"></i>
-      Rejoindre le Discord
+      À propos
     </a>
   </div>
 </section>
@@ -59,38 +60,42 @@
 <div class="stats-strip">
   <div class="stats-strip-inner">
     <div class="stat-item">
-      <div class="stat-icon"><i class="fa-solid fa-file-lines"></i></div>
+      <div class="stat-icon y"><i class="fa-solid fa-file-lines"></i></div>
       <div class="stat-text">
         <strong id="norm-count">—</strong>
-        <span>Normes publiées</span>
+        <span>Normes</span>
       </div>
     </div>
     <div class="stat-item">
-      <div class="stat-icon"><i class="fa-solid fa-layer-group"></i></div>
+      <div class="stat-icon g"><i class="fa-solid fa-layer-group"></i></div>
       <div class="stat-text">
         <strong id="cat-count">—</strong>
         <span>Catégories</span>
       </div>
     </div>
     <div class="stat-item">
-      <div class="stat-icon"><i class="fa-solid fa-flag"></i></div>
+      <div class="stat-icon v"><i class="fa-solid fa-flag"></i></div>
       <div class="stat-text">
         <strong>France</strong>
         <span>Uniquement</span>
       </div>
     </div>
     <div class="stat-item">
-      <div class="stat-icon"><i class="fa-regular fa-calendar"></i></div>
+      <div class="stat-icon b"><i class="fa-regular fa-calendar"></i></div>
       <div class="stat-text">
         <strong>2026</strong>
-        <span>Dernière mise à jour</span>
+        <span>Mis à jour</span>
       </div>
     </div>
   </div>
 </div>
 
 <div class="container page-body">
-  <div id="cat-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px;"></div>
+  <div class="section-label">
+    <i class="fa-solid fa-layer-group"></i>
+    Catégories
+  </div>
+  <div class="cat-grid" id="cat-grid"></div>
 </div>
 
 <footer>
@@ -105,7 +110,7 @@
         <h4>Navigation</h4>
         <ul>
           <li><a href="index.html"><i class="fa-solid fa-house"></i> Accueil</a></li>
-          <li><a href="norm-index.html"><i class="fa-solid fa-list"></i> Index des normes</a></li>
+          <li><a href="norm-index.html"><i class="fa-solid fa-list"></i> Index</a></li>
           <li><a href="about.html"><i class="fa-solid fa-circle-info"></i> À propos</a></li>
         </ul>
       </div>
@@ -131,6 +136,7 @@
     </div>
   </div>
 </footer>
+
 <script src="assets/js/main.js"></script>
 <script>
   (function () {
