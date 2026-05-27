@@ -34,15 +34,14 @@
 </nav>
 
 <section class="hero">
-  <div class="hero-bg"></div>
   <div class="hero-eyebrow">
     <i class="fa-solid fa-circle"></i>
     Build The Earth France
   </div>
   <h1>Construire la France,<br><em>un standard à la fois</em></h1>
-  <p class="hero-desc">Des normes partagées pour que chaque route, bâtiment et arbre soit cohérent sur tout le territoire.</p>
+  <p class="hero-desc">Des normes partagées pour que chaque route, bâtiment et arbre soit cohérent sur tout le territoire reconstruit.</p>
   <div class="hero-actions">
-    <a href="norm-index.html" class="btn btn-jaune">
+    <a href="norm-index.html" class="btn btn-violet">
       <i class="fa-solid fa-book-open"></i>
       Voir les normes
     </a>
@@ -50,7 +49,7 @@
       <i class="fa-brands fa-discord"></i>
       Discord
     </a>
-    <a href="about.html" class="btn btn-ghost">
+    <a href="about.html" class="btn btn-blanc">
       <i class="fa-solid fa-circle-info"></i>
       À propos
     </a>
@@ -60,7 +59,7 @@
 <div class="stats-strip">
   <div class="stats-strip-inner">
     <div class="stat-item">
-      <div class="stat-icon y"><i class="fa-solid fa-file-lines"></i></div>
+      <div class="stat-icon v"><i class="fa-solid fa-file-lines"></i></div>
       <div class="stat-text">
         <strong id="norm-count">—</strong>
         <span>Normes</span>
@@ -74,14 +73,14 @@
       </div>
     </div>
     <div class="stat-item">
-      <div class="stat-icon v"><i class="fa-solid fa-flag"></i></div>
+      <div class="stat-icon b"><i class="fa-solid fa-flag"></i></div>
       <div class="stat-text">
         <strong>France</strong>
         <span>Uniquement</span>
       </div>
     </div>
     <div class="stat-item">
-      <div class="stat-icon b"><i class="fa-regular fa-calendar"></i></div>
+      <div class="stat-icon y"><i class="fa-regular fa-calendar"></i></div>
       <div class="stat-text">
         <strong>2026</strong>
         <span>Mis à jour</span>
@@ -141,32 +140,37 @@
 <script>
   (function () {
     var colors = ['c0','c1','c2','c3','c4','c5'];
-    var grid = document.getElementById('cat-grid');
-    var total = 0;
+    var grid   = document.getElementById('cat-grid');
+    var total  = 0;
 
     NORMS_DATA.forEach(function (cat, idx) {
       total += cat.items.length;
-      var c = colors[idx % colors.length];
+      var c    = colors[idx % colors.length];
       var card = document.createElement('a');
-      card.href = pageUrl('norm-index.html') + '#' + cat.id;
+      card.href      = pageUrl('norm-index.html') + '#' + cat.id;
       card.className = 'cat-card ' + c;
       card.innerHTML =
         '<div class="cat-card-top">'
-        + '<span class="cat-chip ' + c + '">' + cat.id + '</span>'
+        + '<span class="cat-chip">' + cat.id + '</span>'
         + '<i class="' + cat.icon + ' cat-card-icon"></i>'
         + '</div>'
         + '<h3>' + cat.title + '</h3>'
         + '<div class="cat-card-items">'
         + cat.items.slice(0, 4).map(function (i) {
-            return '<div class="cat-card-item"><i class="fa-solid fa-file-lines"></i><span>' + i.id + ' — ' + i.title + '</span></div>';
+            return '<div class="cat-card-item">'
+              + '<i class="fa-solid fa-file-lines"></i>'
+              + '<span>' + i.id + ' — ' + i.title + '</span>'
+              + '</div>';
           }).join('')
-        + (cat.items.length > 4 ? '<div class="cat-card-item" style="color:#555">+ ' + (cat.items.length - 4) + ' autre(s)...</div>' : '')
+        + (cat.items.length > 4
+            ? '<div class="cat-card-item" style="opacity:0.5">+ ' + (cat.items.length - 4) + ' autre(s)...</div>'
+            : '')
         + '</div>';
       grid.appendChild(card);
     });
 
     document.getElementById('norm-count').textContent = total;
-    document.getElementById('cat-count').textContent = NORMS_DATA.length;
+    document.getElementById('cat-count').textContent  = NORMS_DATA.length;
   })();
 </script>
 
